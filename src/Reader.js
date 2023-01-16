@@ -4,14 +4,13 @@ import CameraswitchIcon from '@mui/icons-material/Cameraswitch';
 import { BrowserMultiFormatReader, BarcodeFormat, DecodeHintType } from '@zxing/library';
 const Reader = () => {
     const [localStream, setLocalStream] = useState();
-
     const [cameraDir, setCameraDir] = useState('environment');
-
+    const [text, setText] = useState('');
     const Camera = useRef(null);
     const hints = new Map();
     const formats = [BarcodeFormat.QR_CODE, BarcodeFormat.DATA_MATRIX, BarcodeFormat.CODE_128, BarcodeFormat.CODABAR, BarcodeFormat.EAN_13, BarcodeFormat.EAN_8, BarcodeFormat.CODE_39, BarcodeFormat.CODE_93];
     hints.set(DecodeHintType.POSSIBLE_FORMATS, formats);
-    const Scan = new BrowserMultiFormatReader(hints, 500);
+    const Scan = new BrowserMultiFormatReader(hints, 100);
     useEffect(() => {
         navigator.mediaDevices.getUserMedia({
             //video: { facingMode: "user" }, //전면
@@ -36,16 +35,39 @@ const Reader = () => {
         };
     }, [localStream]);
     const req = useRef();
+
+    const isCodePWSFormat = function(str_code) {
+        if(str_code.length != 9) {console.log('code length is not 9.');return false;}
+        
+        if(str_code.charAt(0) != 'H') {console.log(`index of 0 is not 'H'`);return false;}
+        
+        const ltxt = str_code.substr(1, 2);
+        if(isNaN(ltxt)) {console.log('year code is not number');return false;}
+
+        if(str_code.charAt(3) != 'N') {console.log(`index of 3 is not 'N'`);return false;}
+        const rtxt = str_code.substr(4, 5);
+        if(isNaN(rtxt)) {console.log('last 5 character is not number.');return false;}
+
+        console.log(`It's PWS barcode type.`);
+        return true;
+    };
+
     const Scanning = async () => {
         // const t = await Scan.decodeOnce();
         console.log('scan');
+        
         if (localStream && Camera.current) {
             try {
                 const data = await Scan.decodeFromStream(localStream, Camera.current, (data, err) => {
                     if (data) {
-                        setText(data.getText());
-                        console.log(data.getText());
-                        // Scan.stopContinuousDecode();
+                        if(isCodePWSFormat(data.getText())) {
+                            // Scan.stopStreams();  // 카메라 스트림 중지
+                            setText(data.getText());
+                            
+                        }
+                        else {
+                            console.log('It is not PWS barcode.');
+                        }          
                     }
                     else {
                         ; //setText("");
@@ -57,6 +79,7 @@ const Reader = () => {
             }
         }
     };
+    
     const Stop = () => {
         if (localStream) {
             const vidTrack = localStream.getVideoTracks();
@@ -65,7 +88,7 @@ const Reader = () => {
             });
         }
     };
-    const [text, setText] = useState('');
+    
 
     const onToggleCemeraHandler = e => {
         if(cameraDir === 'environment') {
