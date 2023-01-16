@@ -4,11 +4,12 @@ import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
 import Reader from './Reader';
+import ContentList from './components/ContentList';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
 root.render(
   <React.StrictMode>
-    <Reader />
+    <ContentList />
   </React.StrictMode>
 );
 

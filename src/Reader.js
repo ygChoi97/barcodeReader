@@ -2,11 +2,13 @@ import React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import CameraswitchIcon from '@mui/icons-material/Cameraswitch';
 import { BrowserMultiFormatReader, BarcodeFormat, DecodeHintType } from '@zxing/library';
+import beepScan from './sounds/Barcode-scanner-beep-sound.mp3';
 const Reader = () => {
     const [localStream, setLocalStream] = useState();
     const [cameraDir, setCameraDir] = useState('environment');
     const [text, setText] = useState('');
     const Camera = useRef(null);
+    const scanSound = new Audio(beepScan);
     const hints = new Map();
     const formats = [BarcodeFormat.QR_CODE, BarcodeFormat.DATA_MATRIX, BarcodeFormat.CODE_128, BarcodeFormat.CODABAR, BarcodeFormat.EAN_13, BarcodeFormat.EAN_8, BarcodeFormat.CODE_39, BarcodeFormat.CODE_93];
     hints.set(DecodeHintType.POSSIBLE_FORMATS, formats);
@@ -61,9 +63,10 @@ const Reader = () => {
                 const data = await Scan.decodeFromStream(localStream, Camera.current, (data, err) => {
                     if (data) {
                         if(isCodePWSFormat(data.getText())) {
-                            // Scan.stopStreams();  // 카메라 스트림 중지
-                            setText(data.getText());
-                            
+                            Scan.stopStreams();  // 카메라 스트림 중지
+                            scanSound.loop = false;
+                            scanSound.play();
+                            setText(data.getText());                            
                         }
                         else {
                             console.log('It is not PWS barcode.');
