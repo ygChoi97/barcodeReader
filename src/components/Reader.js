@@ -2,7 +2,7 @@ import React from 'react';
 import { useEffect, useRef, useState } from 'react';
 import CameraswitchIcon from '@mui/icons-material/Cameraswitch';
 import { BrowserMultiFormatReader, BarcodeFormat, DecodeHintType } from '@zxing/library';
-import beepScan from './sounds/Barcode-scanner-beep-sound.mp3';
+import beepScan from '../sounds/Barcode-scanner-beep-sound.mp3';
 const Reader = () => {
     const [localStream, setLocalStream] = useState();
     const [cameraDir, setCameraDir] = useState('environment');
@@ -66,6 +66,7 @@ const Reader = () => {
                             Scan.stopStreams();  // 카메라 스트림 중지
                             scanSound.loop = false;
                             scanSound.play();
+                            
                             setText(data.getText());                            
                         }
                         else {
