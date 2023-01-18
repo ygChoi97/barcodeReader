@@ -14,18 +14,18 @@ function ScannerBtn() {
     return(
         <div className="wrapper" style={{border:'solid 1px'}}>
 
-        <div>
-            {doScan ?
-            <LinkedCameraRounded  sx={{ fontSize: 25 }} onClick={onToggleScanHandler}/>
-            :
-            <AddAPhotoRounded  sx={{ fontSize: 25 }} onClick={onToggleScanHandler}/>
-}
-        </div>
+            <div>
+            { doScan ?
+                <LinkedCameraRounded  sx={{ fontSize: 25 }} onClick={onToggleScanHandler}/>
+                :
+                <AddAPhotoRounded  sx={{ fontSize: 25 }} onClick={onToggleScanHandler}/>
+            }
+            </div>
+                
             
-        
-        <div>
-        <LeftInfo item={doScan}/>
-        </div>
+            <div>
+                <LeftInfo item={doScan}/>
+            </div>
         </div>
     );
 }

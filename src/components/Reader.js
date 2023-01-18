@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useEffect, useRef, useState } from 'react';
 import CameraswitchIcon from '@mui/icons-material/Cameraswitch';
 import { BrowserMultiFormatReader, BarcodeFormat, DecodeHintType } from '@zxing/library';
 import beepScan from '../sounds/Barcode-scanner-beep-sound.mp3';
+import PwsContext from './PWS-Context';
 const Reader = () => {
     const [localStream, setLocalStream] = useState();
     const [cameraDir, setCameraDir] = useState('environment');
@@ -13,6 +14,9 @@ const Reader = () => {
     const formats = [BarcodeFormat.QR_CODE, BarcodeFormat.DATA_MATRIX, BarcodeFormat.CODE_128, BarcodeFormat.CODABAR, BarcodeFormat.EAN_13, BarcodeFormat.EAN_8, BarcodeFormat.CODE_39, BarcodeFormat.CODE_93];
     hints.set(DecodeHintType.POSSIBLE_FORMATS, formats);
     const Scan = new BrowserMultiFormatReader(hints, 100);
+
+    const { managementId, setManagementId } = useContext(PwsContext);
+
     useEffect(() => {
         navigator.mediaDevices.getUserMedia({
             //video: { facingMode: "user" }, //전면
@@ -63,11 +67,13 @@ const Reader = () => {
                 const data = await Scan.decodeFromStream(localStream, Camera.current, (data, err) => {
                     if (data) {
                         if(isCodePWSFormat(data.getText())) {
-                            Scan.stopStreams();  // 카메라 스트림 중지
+                            //Scan.stopStreams();  // 카메라 스트림 중지
                             scanSound.loop = false;
                             scanSound.play();
                             
-                            setText(data.getText());                            
+                            setText(data.getText());       
+                            setManagementId(data.getText());    // 자산관리번호 바코드 스캔 결과 Context 에 저장
+                            
                         }
                         else {
                             console.log('It is not PWS barcode.');
@@ -93,7 +99,7 @@ const Reader = () => {
         }
     };
     
-
+    // 카메라아이콘 클릭 핸들러 (카메라 전환)
     const onToggleCemeraHandler = e => {
         if(cameraDir === 'environment') {
             console.log('user');
