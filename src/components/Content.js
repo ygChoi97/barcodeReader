@@ -60,9 +60,9 @@ function Content({item, update}) {
                             fullWidth
                             requierd='true'
                             id="outlined-required"
-                            label={item.columnName}
+                            //label={item.columnName}
                             defaultValue=''
-                            value = {dataState}
+                            value = {item.data}
                             onChange={handleChangeInput}
                             size="small"
                         /> 
@@ -70,9 +70,9 @@ function Content({item, update}) {
                         //placeholder={item.value}
                         fullWidth
                         id="standard-basic"
-                        label={item.columnName}
+                        //label={item.columnName}
                         defaultValue=''
-                        value = {dataState}
+                        value = {item.data}
                         onChange={handleChangeInput}
                         size="small"
                     /> }

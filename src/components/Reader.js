@@ -16,8 +16,9 @@ const Reader = () => {
     const Scan = new BrowserMultiFormatReader(hints, 100);
 
     const { managementId, setManagementId } = useContext(PwsContext);
-
+    
     useEffect(() => {
+        setManagementId('H22N21044');
         navigator.mediaDevices.getUserMedia({
             //video: { facingMode: "user" }, //전면
             video: { width:{min:320, ideal:640, max:1280}, height:{min:180, ideal:360, max:720}, facingMode: { exact: cameraDir } }, //후면
