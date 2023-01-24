@@ -1,8 +1,6 @@
 import { AddAPhotoOutlined, AddAPhotoRounded, AddAPhotoTwoTone, LinkedCameraRounded } from "@mui/icons-material";
 import React, { useState } from "react";
 import LeftInfo from "./LeftInfo";
-import Reader from "./Reader";
-import SubComp from "./SubComp";
 
 function ScannerBtn() {
     const [doScan, setDoScan] = useState(false);

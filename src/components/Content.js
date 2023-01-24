@@ -40,7 +40,7 @@ function Content({item, update}) {
                     </Grid>
                     <Grid  xs={8}>
                         {item.req == 'y' ?
-                        item.columnName == '자산관리번호' ?  
+                        item.dbColumn == 'idasset' ?  
                         <TextField
                             // placeholder={item.value}
                             fullWidth

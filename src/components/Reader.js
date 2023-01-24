@@ -13,19 +13,24 @@ const Reader = () => {
     const hints = new Map();
     const formats = [BarcodeFormat.QR_CODE, BarcodeFormat.DATA_MATRIX, BarcodeFormat.CODE_128, BarcodeFormat.CODABAR, BarcodeFormat.EAN_13, BarcodeFormat.EAN_8, BarcodeFormat.CODE_39, BarcodeFormat.CODE_93];
     hints.set(DecodeHintType.POSSIBLE_FORMATS, formats);
-    const Scan = new BrowserMultiFormatReader(hints, 100);
+    const Scan = new BrowserMultiFormatReader(hints, 200);
 
     const { managementId, setManagementId } = useContext(PwsContext);
-    
+    const facingModeFlip = () => {
+        if(cameraDir == 'environment') setCameraDir('user');
+        if(cameraDir == 'user') setCameraDir('environment');
+    }
     useEffect(() => {
-        setManagementId('H22N21044');
+        //setManagementId('H22N21044'); // 카메라 없는 환경 테스트
         navigator.mediaDevices.getUserMedia({
-            //video: { facingMode: "user" }, //전면
-            video: { width:{min:320, ideal:640, max:1280}, height:{min:180, ideal:360, max:720}, facingMode: { exact: cameraDir } }, //후면
+            video: { width:{min:160, ideal:320, max:640}, height:{min:90, ideal:180, max:360}, facingMode: { exact: cameraDir } },
         })
             .then(stream => {
-            console.log(stream);
-            setLocalStream(stream);
+                
+                setLocalStream(stream);
+        })
+        .catch((err) => {
+            if(err.name == 'OverconstrainedError' && err.constraint == 'facingMode')  {facingModeFlip();console.log('camera direction : ', cameraDir);}
         });
         return () => {
             Stop();
@@ -44,6 +49,7 @@ const Reader = () => {
     const req = useRef();
 
     const isCodePWSFormat = function(str_code) {
+        console.log(str_code);
         if(str_code.length != 9) {console.log('code length is not 9.');return false;}
         
         if(str_code.charAt(0) != 'H') {console.log(`index of 0 is not 'H'`);return false;}
