@@ -24,6 +24,7 @@ function ContentList() {
     
     const [contents, setContents] = useState([]);
     const [pwsInfo, setPwsInfo] = useState({});
+    const [bUploadDisabled, setBUploadDisabled] = useState(true);
     // 자산관리번호 update 함수
     const modifyContents = () => {
         let copyContents = [...contents];
@@ -53,12 +54,14 @@ function ContentList() {
             }
         }
         setContents(copyContents);
-        console.log(contents);
+        // console.log(contents);
         let info = {};
         for(let i=0; i<copyContents.length; i++){
             info[copyContents[i].dbColumn] = copyContents[i].data;
         }
         setPwsInfo(info);
+
+        setBUploadDisabled(false);
     };
 
     // DB에서 읽은 PWS정보를 PWS UI정보에 저장
@@ -113,6 +116,7 @@ function ContentList() {
     // 자산관리번호 스캔 발생하면 자산관리번호 update 함수 호출하고 재랜더링
     useEffect(() => {
         console.log("update : ", managementId);
+        
         if(managementId != '') {
             modifyContents();
             fetch(BASE_URL + `/${managementId}`)
@@ -175,32 +179,8 @@ function ContentList() {
                 }}>
                     <List>
                         {items}
-                        {/* <Content key={contents[0].column} item={contents[0]} />
-                        <Content key={contents[1].column} item={contents[1]} />
-                        <Content key={contents[2].column} item={contents[2]} />
-                        <Content key={contents[3].column} item={contents[3]} />
-                        <Content key={contents[4].column} item={contents[4]} />
-                        <Content key={contents[5].column} item={contents[5]} />
-                        <Content key={contents[6].column} item={contents[6]} />
-                        <Content key={contents[7].column} item={contents[7]} />
-                        <Content key={contents[8].column} item={contents[8]} />
-                        <Content key={contents[9].column} item={contents[9]} />
-                        <Content key={contents[10].column} item={contents[10]} />
-                        <Content key={contents[11].column} item={contents[11]} />
-                        <Content key={contents[12].column} item={contents[12]} />
-                        <Content key={contents[13].column} item={contents[13]} />
-                        <Content key={contents[14].column} item={contents[14]} />
-                        <Content key={contents[15].column} item={contents[15]} />
-                        <Content key={contents[16].column} item={contents[16]} />
-                        <Content key={contents[17].column} item={contents[17]} />
-                        <Content key={contents[18].column} item={contents[18]} />
-                        <Content key={contents[19].column} item={contents[19]} />
-                        <Content key={contents[20].column} item={contents[20]} />
-                        <Content key={contents[21].column} item={contents[21]} />
-                        <Content key={contents[22].column} item={contents[22]} /> */}
                     </List>
-                    <Button variant="contained" onClick={onClickUploadHandler}>업로드</Button>
-                    <Button variant="contained" onClick={onClickModifyHandler}>수정</Button>
+                    <Button variant="contained" disabled={bUploadDisabled} onClick={onClickUploadHandler}>업로드</Button>
                 </Paper>
         </div>
     );
