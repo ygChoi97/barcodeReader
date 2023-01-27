@@ -25,23 +25,31 @@ function ContentList() {
     const [contents, setContents] = useState([]);
     const [pwsInfo, setPwsInfo] = useState({});
     const [bUploadDisabled, setBUploadDisabled] = useState(true);
+    const [bModifyDisabled, setBModifyDisabled] = useState(true);
+    const [btnMode, setBtnMode] = useState('');
+    
     // 자산관리번호 update 함수
     const modifyContents = () => {
         let copyContents = [...contents];
         for(let i=0; i<copyContents.length; i++) {
-            if(copyContents[i].columnName == '자산관리번호') {
+            if(copyContents[i].dbColumn == 'idasset') {
                 copyContents[i].data = managementId;
                 console.log('pk : ', copyContents[i].data);
-                break;
+            }
+            else {
+                copyContents[i].data = '';
             }
         }
         setContents(copyContents);
+        console.log('contents updated: ', contents);
 
         let info = {};
         for(let i=0; i<copyContents.length; i++){
             info[copyContents[i].dbColumn] = copyContents[i].data;
         }
         setPwsInfo(info);
+
+        console.log(pwsInfo);
     }
 
     // 각 PWS 입력 항목 update 함수
@@ -54,14 +62,17 @@ function ContentList() {
             }
         }
         setContents(copyContents);
-        // console.log(contents);
+        console.log('contents updated: ', contents);
         let info = {};
         for(let i=0; i<copyContents.length; i++){
             info[copyContents[i].dbColumn] = copyContents[i].data;
         }
         setPwsInfo(info);
-
-        setBUploadDisabled(false);
+        console.log(pwsInfo);
+        if(contents[0].data != null) 
+            setBUploadDisabled(false);
+        else
+            setBUploadDisabled(true);
     };
 
     // DB에서 읽은 PWS정보를 PWS UI정보에 저장
@@ -78,12 +89,13 @@ function ContentList() {
             }
         }
         setContents(copyContents);
-        console.log('contents : ', contents);
+        console.log('contents updated: ', contents);
     }
 
     // PWS 정보 렌더링 
-    const items = contents.map(item =>
-        <Content key={item.columnName} item={item} update={update}/>);
+    const items = contents.map(item => {
+        return <Content key={item.columnName} item={item} update={update}/>;
+    });
     
     useEffect(() => {
         fetch(BASE_URL+`/menu`)
@@ -100,13 +112,13 @@ function ContentList() {
                 let copyContent = {};
                 copyContent.columnName = json[i].column_comment;
                 copyContent.dbColumn = json[i].column_name;
-                if(json[i].column_name == 'idasset')
+                if(json[i].column_name == 'idasset' || json[i].column_name == 'introductiondate')
                     copyContent.req = 'y';
                 console.log(copyContent);
                 copyContents.push(copyContent);
             }
-            console.log(copyContents);
             setContents(copyContents);
+            console.log('contents updated: ', contents);
         })
         .catch((error) => {
             console.log('error: ' + error);
@@ -121,11 +133,16 @@ function ContentList() {
             modifyContents();
             fetch(BASE_URL + `/${managementId}`)
                 .then(res => {
-                    if(!res.ok) {alert('등록할까요?');throw new Error(res.status);}
+                    if(res.status == 404) {console.log(res);alert('등록할까요?');}
+                    else if(!res.ok) {throw new Error(res.status);}
                     else return res.json();          
                 })
-                .then(json => {                    
-                    console.log('json : ', json);                   
+                .then(json => { 
+                    // if(json != undefined) {
+                    //     console.log('json : ', json);                   
+                    //     insertPwsFromDB(json);
+                    // }
+                    console.log('json : ', json);  
                     insertPwsFromDB(json);
                 })
                 .catch((error) => {
@@ -133,6 +150,10 @@ function ContentList() {
                 })
         }
     },[managementId]);
+
+    // useEffect(()=>{
+    //     console.log('contents updated');
+    // },[contents]);
 
     const onClickUploadHandler = e => {
         
@@ -143,13 +164,19 @@ function ContentList() {
             body: JSON.stringify(pwsInfo)
         })
         .then(res => {
-            if(!res.ok) {console.log(JSON.stringify(pwsInfo));throw new Error(res.status);}
+            if(!res.ok) {
+                console.log(JSON.stringify(pwsInfo));
+                throw new Error(res.status);}
             else return res.json();          
         })
-        .then(json=>{console.log(json);
+        .then(json=>{ 
+            console.log(json);
+            alert(`DB 저장 완료! - ${pwsInfo.idasset}`);
+            setBUploadDisabled(true);
         })
         .catch(error => {
-            console.log('error: ' + error);
+            alert(`DB 저장 실패! - ${error}`);
+            console.log(error);
         });
     }
 
@@ -166,9 +193,11 @@ function ContentList() {
         .then(json=>{console.log(json);
         })
         .catch(error => {
-            console.log('error: ' + error);
+            console.log(error);
         });
     }
+
+    console.log('리렌더링');
     return(
         <div className="wrapper" style={{border:'solid 1px', display:'flex', justifyContent:'flex-end'}}>                
                 <Paper sx={{
@@ -180,7 +209,8 @@ function ContentList() {
                     <List>
                         {items}
                     </List>
-                    <Button variant="contained" disabled={bUploadDisabled} onClick={onClickUploadHandler}>업로드</Button>
+                    <Button variant="contained" disabled={bUploadDisabled} onClick={onClickUploadHandler}>upload</Button>
+                    <Button variant="contained" disabled={bModifyDisabled} onClick={onClickModifyHandler}>modify</Button>
                 </Paper>
         </div>
     );

@@ -1,30 +1,41 @@
-import { Grid, ListItem, TextField, Typography } from "@mui/material";
+import { Button, Grid, ListItem, TextField, Typography } from "@mui/material";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import dayjs from 'dayjs';
 import React, { useEffect, useState } from "react";
 
 function Content({item, update}) {
+
+    
+    const [value, setValue] = useState((item.dbColumn == 'introductiondate' && item.data != '') ? new Date(item.data) : null);
+    if(item.dbColumn == 'introductiondate' && item.data != null){
+        //console.log(dayjs(item.data).format("YYYY-MM-DD"));
+        //console.log('date : ' ,dayjs(item.data).format("YYYY-MM-DD").getMonth());
+        //console.log(new Date(item.data));
+        
+    }
+    
+    
+    
     const theme = createTheme({
         typography: {
           // In Chinese and Japanese the characters are usually larger,
           // so a smaller fontsize may be appropriate.
-          fontSize: 7,
+          fontSize: 8,
           
         },
     });
-    const [dataState, setDataState] = useState(item.data);
     
     const handleChangeInput = (e) => {
-        setDataState(e.target.value);
         console.log(e.target);
-        const copyItem = item;
-        copyItem.data = e.target.value;
-        
+        // const copyItem = item;
+        // copyItem.data = e.target.value;
+        item.data = e.target.value;
         update(item);
     };
-    // useEffect(()=>{
-    //     setDataState(item.columnName);
-    //     setItemState()
-    // },[data]);
+
+    console.log('content 리렌더링 ', value);
     return(
         <ListItem 
         sx={{
@@ -55,7 +66,30 @@ function Content({item, update}) {
                             size="small"
                             color="secondary"
                             focused
-                        /> :
+                        /> : 
+                        item.dbColumn == 'introductiondate' ?
+                        // <div style={{display:'flex', flexDirection:'row', justifyContent:'space-between'}}>
+                        // <TextField
+                        //     requierd='true'
+                        //     id="standard-read-only-input"
+                        //     InputProps={{
+                        //         readOnly: true,
+                        //       }}
+                        //     defaultValue=''
+                        //     value = {item.data}
+                        //     size="small"
+                        // /> <Button variant="contained" color="secondary">날짜</Button> 
+                        // </div>:
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <DatePicker value={value}  inputFormat={"YYYY-MM-DD"}
+           onChange={(newValue) => {
+                                setValue(newValue);
+                                console.log(newValue);
+                                //item.data = newValue;
+                            }}
+                            renderInput={(params) => <TextField {...params} />}
+                            />
+                          </LocalizationProvider> :
                         <TextField
                             fullWidth
                             requierd='true'

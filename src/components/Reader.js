@@ -13,7 +13,7 @@ const Reader = () => {
     const hints = new Map();
     const formats = [BarcodeFormat.QR_CODE, BarcodeFormat.DATA_MATRIX, BarcodeFormat.CODE_128, BarcodeFormat.CODABAR, BarcodeFormat.EAN_13, BarcodeFormat.EAN_8, BarcodeFormat.CODE_39, BarcodeFormat.CODE_93];
     hints.set(DecodeHintType.POSSIBLE_FORMATS, formats);
-    const Scan = new BrowserMultiFormatReader(hints, 200);
+    const Scan = new BrowserMultiFormatReader(hints, 300);
 
     const { managementId, setManagementId } = useContext(PwsContext);
     const facingModeFlip = () => {
@@ -23,7 +23,7 @@ const Reader = () => {
     useEffect(() => {
         //setManagementId('H22N21044'); // 카메라 없는 환경 테스트
         navigator.mediaDevices.getUserMedia({
-            video: { width:{min:160, ideal:320, max:640}, height:{min:90, ideal:180, max:360}, facingMode: { exact: cameraDir } },
+            video: { width:{min:320, ideal:640, max:1280}, height:{min:180, ideal:360, max:720}, facingMode: { exact: cameraDir } },
         })
             .then(stream => {
                 
@@ -74,7 +74,7 @@ const Reader = () => {
                 const data = await Scan.decodeFromStream(localStream, Camera.current, (data, err) => {
                     if (data) {
                         if(isCodePWSFormat(data.getText())) {
-                            //Scan.stopStreams();  // 카메라 스트림 중지
+                            Scan.stopStreams();  // 카메라 스트림 중지
                             scanSound.loop = false;
                             scanSound.play();
                             
