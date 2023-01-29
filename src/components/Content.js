@@ -8,13 +8,17 @@ import React, { useEffect, useState } from "react";
 function Content({item, update}) {
 
     
-    const [value, setValue] = useState((item.dbColumn == 'introductiondate' && item.data != '') ? new Date(item.data) : null);
-    if(item.dbColumn == 'introductiondate' && item.data != null){
-        //console.log(dayjs(item.data).format("YYYY-MM-DD"));
-        //console.log('date : ' ,dayjs(item.data).format("YYYY-MM-DD").getMonth());
-        //console.log(new Date(item.data));
-        
-    }
+    const [value, setValue] = useState(null);
+    
+    useEffect(()=> {
+        if(item.dbColumn == 'introductiondate' && item.data != null) {
+            
+            setValue(new Date(item.data));
+        }
+        else if(item.dbColumn == 'introductiondate' && (item.data == null || item.data == '')) {
+            setValue(null);
+        }
+    },[item.data]);
     
     
     
@@ -34,8 +38,8 @@ function Content({item, update}) {
         item.data = e.target.value;
         update(item);
     };
-
-    console.log('content 리렌더링 ', value);
+    
+    console.log(`${item.dbColumn} ${value} 리렌더링`);
     return(
         <ListItem 
         sx={{
@@ -45,7 +49,7 @@ function Content({item, update}) {
             <Grid container spacing={1} alignItems="center">
                 <ThemeProvider theme={theme}>
                     <Grid xs={4}>            
-                        <Typography>
+                        <Typography sx = {{fontSize:12, fontWeight:600}}>
                             {item.columnName}
                         </Typography>        
                     </Grid>
@@ -68,26 +72,16 @@ function Content({item, update}) {
                             focused
                         /> : 
                         item.dbColumn == 'introductiondate' ?
-                        // <div style={{display:'flex', flexDirection:'row', justifyContent:'space-between'}}>
-                        // <TextField
-                        //     requierd='true'
-                        //     id="standard-read-only-input"
-                        //     InputProps={{
-                        //         readOnly: true,
-                        //       }}
-                        //     defaultValue=''
-                        //     value = {item.data}
-                        //     size="small"
-                        // /> <Button variant="contained" color="secondary">날짜</Button> 
-                        // </div>:
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            <DatePicker value={value}  inputFormat={"YYYY-MM-DD"}
-           onChange={(newValue) => {
+                            <DatePicker value={value}  inputFormat={"YYYY-MM-DD"} 
+                                onChange={(newValue) => {
                                 setValue(newValue);
+                                item.data = newValue.format("YYYY-MM-DD");
+                                update(item);
                                 console.log(newValue);
                                 //item.data = newValue;
                             }}
-                            renderInput={(params) => <TextField {...params} />}
+                            renderInput={(params) => <TextField size="small" {...params} />}
                             />
                           </LocalizationProvider> :
                         <TextField

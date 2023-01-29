@@ -3,6 +3,7 @@ import React, { useContext, useEffect, useState } from "react";
 import Content from "./Content";
 import '../css/main.css';
 import PwsContext from "./PWS-Context";
+import { isSameDateError } from "@mui/x-date-pickers/internals/hooks/validation/useDateValidation";
 
 const BASE_URL = 'http://localhost:8181/api/pws';
 
@@ -12,21 +13,14 @@ function ContentList() {
     console.log('ContentList start');
     
     // PWS UI정보
-    // const [contents, setContents] = useState([
-    //                 {columnName:"자산관리번호", dbColumn:"idasset", data:"", req:"y"}, {columnName:"사용구분", dbColumn:"uptake", data:"", req:"y"}, {columnName:"회사", dbColumn:"company", data:"", req:"y"}, 
-    //                 {columnName:"본부", dbColumn:"headquarters", data:"", req:"n"}, {columnName:"센터", dbColumn:"center", data:"", req:"y"}, {columnName:"관리부서", dbColumn:"department", data:"", req:"y"}, 
-    //                 {columnName:"사용자", dbColumn:"username", data:"", req:"y"},{columnName:"사용자ID", dbColumn:"userid", data:"", req:"y"}, {columnName:"코스트센터CD", dbColumn:"centercd", data:"", req:"y"}, 
-    //                 {columnName:"모델명", dbColumn:"model", data:"", req:"y"},{columnName:"자산번호", dbColumn:"assetno", data:"", req:"y"}, {columnName:"S/N", dbColumn:"sn", data:"", req:"y"},
-    //                 {columnName:"그래픽카드", dbColumn:"graphic", data:"", req:"n"}, {columnName:"모니터", dbColumn:"monitor", data:"", req:"y"}, {columnName:"지역", dbColumn:"area", data:"", req:"y"},
-    //                 {columnName:"건물명", dbColumn:"building", data:"", req:"y"}, {columnName:"층수", dbColumn:"storey", data:"", req:"y"}, {columnName:"상세위치", dbColumn:"location", data:"", req:"n"},                         
-    //                 {columnName:"구매용도", dbColumn:"objpurchase", data:"", req:"y"}, {columnName:"사용용도", dbColumn:"objuse", data:"", req:"y"}, {columnName:"도입년월", dbColumn:"introductiondate", data:"", req:"y"},
-    //                 {columnName:"비고", dbColumn:"note", data:"", req:"n"}, {columnName:"상세업무", dbColumn:"desctask", data:"", req:"n"}]);
-    
     const [contents, setContents] = useState([]);
+
+    // pws json
     const [pwsInfo, setPwsInfo] = useState({});
+
     const [bUploadDisabled, setBUploadDisabled] = useState(true);
     const [bModifyDisabled, setBModifyDisabled] = useState(true);
-    const [btnMode, setBtnMode] = useState('');
+    const [btnMode, setBtnMode] = useState(true);
     
     // 자산관리번호 update 함수
     const modifyContents = () => {
@@ -36,9 +30,10 @@ function ContentList() {
                 copyContents[i].data = managementId;
                 console.log('pk : ', copyContents[i].data);
             }
-            else {
+            else if(copyContents[i].dbColumn == 'introductiondate')            
+                copyContents[i].data = null;
+            else
                 copyContents[i].data = '';
-            }
         }
         setContents(copyContents);
         console.log('contents updated: ', contents);
@@ -70,9 +65,9 @@ function ContentList() {
         setPwsInfo(info);
         console.log(pwsInfo);
         if(contents[0].data != null) 
-            setBUploadDisabled(false);
+            setBtnMode(false);
         else
-            setBUploadDisabled(true);
+            setBtnMode(true);
     };
 
     // DB에서 읽은 PWS정보를 PWS UI정보에 저장
@@ -103,23 +98,29 @@ function ContentList() {
             if(!res.ok) {alert('메뉴를 가져오지 못했습니다.');throw new Error(res.status);}
             else {console.log(res); return res.json();}
         })
-        .then(json => {
-            console.log(json);
-            
+        .then(json => {            
             // 메뉴등록
-            let copyContents = [];
-            for(let i=0; i<json.length; i++) {
-                let copyContent = {};
-                copyContent.columnName = json[i].column_comment;
-                copyContent.dbColumn = json[i].column_name;
-                if(json[i].column_name == 'idasset' || json[i].column_name == 'introductiondate')
-                    copyContent.req = 'y';
-                console.log(copyContent);
-                copyContents.push(copyContent);
-            }
-            setContents(copyContents);
-            console.log('contents updated: ', contents);
-        })
+
+            const fetchMenu = async() =>{
+                try {
+                    let copyContents = [];
+                    for(let i=0; i<json.length; i++) {
+                        let copyContent = {};
+                        copyContent.columnName = json[i].column_comment;
+                        copyContent.dbColumn = json[i].column_name;
+                        if(json[i].column_name == 'idasset' || json[i].column_name == 'introductiondate')
+                            copyContent.req = 'y';
+                        console.log(copyContent);
+                        copyContents.push(copyContent);
+                    }
+                    setContents(copyContents);
+                    console.log('contents updated: ', contents);
+                }catch(e) {
+                    console.log(e);
+                }
+            };
+            fetchMenu();
+        }, [])
         .catch((error) => {
             console.log('error: ' + error);
         })
@@ -130,12 +131,12 @@ function ContentList() {
         console.log("update : ", managementId);
         
         if(managementId != '') {
-            modifyContents();
+            
             fetch(BASE_URL + `/${managementId}`)
                 .then(res => {
-                    if(res.status == 404) {console.log(res);alert('등록할까요?');}
+                    if(res.status == 404) {modifyContents(); console.log(res); setBtnMode(true); setBUploadDisabled(false); setBModifyDisabled(true); alert('등록할까요?'); return res.json();}
                     else if(!res.ok) {throw new Error(res.status);}
-                    else return res.json();          
+                    else {setBtnMode(true); setBModifyDisabled(false); setBUploadDisabled(true); return res.json();}
                 })
                 .then(json => { 
                     // if(json != undefined) {
@@ -167,12 +168,12 @@ function ContentList() {
             if(!res.ok) {
                 console.log(JSON.stringify(pwsInfo));
                 throw new Error(res.status);}
-            else return res.json();          
+            else { setBtnMode(true); setBUploadDisabled(true); setBModifyDisabled(false); return res.json(); }
         })
         .then(json=>{ 
             console.log(json);
             alert(`DB 저장 완료! - ${pwsInfo.idasset}`);
-            setBUploadDisabled(true);
+            
         })
         .catch(error => {
             alert(`DB 저장 실패! - ${error}`);
@@ -188,7 +189,7 @@ function ContentList() {
         })
         .then(res => {
             if(!res.ok) {console.log(JSON.stringify(pwsInfo));throw new Error(res.status);}
-            else return res.json();          
+            else {setBtnMode(true); return res.json(); }      
         })
         .then(json=>{console.log(json);
         })
@@ -197,7 +198,7 @@ function ContentList() {
         });
     }
 
-    console.log('리렌더링');
+    console.log('ContentList 리렌더링');
     return(
         <div className="wrapper" style={{border:'solid 1px', display:'flex', justifyContent:'flex-end'}}>                
                 <Paper sx={{
@@ -209,8 +210,8 @@ function ContentList() {
                     <List>
                         {items}
                     </List>
-                    <Button variant="contained" disabled={bUploadDisabled} onClick={onClickUploadHandler}>upload</Button>
-                    <Button variant="contained" disabled={bModifyDisabled} onClick={onClickModifyHandler}>modify</Button>
+                    <Button variant="contained" color="secondary" sx={{ width: 80, height:27, padding: 1, margin: 1 }} disabled={bUploadDisabled | btnMode} onClick={onClickUploadHandler}>upload</Button>
+                    <Button variant="contained" sx={{ width: 80, height:27, padding: 1, margin: 1 }} disabled={bModifyDisabled | btnMode} onClick={onClickModifyHandler}>modify</Button>
                 </Paper>
         </div>
     );
