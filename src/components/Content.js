@@ -1,8 +1,7 @@
-import { Button, Grid, ListItem, TextField, Typography } from "@mui/material";
+import { Grid, ListItem, TextField, Typography } from "@mui/material";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
-import dayjs from 'dayjs';
 import React, { useEffect, useState } from "react";
 
 function Content({item, update}) {
@@ -11,11 +10,11 @@ function Content({item, update}) {
     const [value, setValue] = useState(null);
     
     useEffect(()=> {
-        if(item.dbColumn == 'introductiondate' && item.data != null) {
+        if(item.dbColumn === 'introductiondate' && item.data != null) {
             
             setValue(new Date(item.data));
         }
-        else if(item.dbColumn == 'introductiondate' && (item.data == null || item.data == '')) {
+        else if(item.dbColumn === 'introductiondate' && (item.data === null || item.data === '')) {
             setValue(null);
         }
     },[item.data]);
@@ -48,14 +47,14 @@ function Content({item, update}) {
             
             <Grid container spacing={1} alignItems="center">
                 <ThemeProvider theme={theme}>
-                    <Grid xs={4}>            
+                    <Grid item xs={3}>            
                         <Typography sx = {{fontSize:12, fontWeight:600}}>
                             {item.columnName}
                         </Typography>        
                     </Grid>
-                    <Grid  xs={8}>
-                        {item.req == 'y' ?
-                        item.dbColumn == 'idasset' ?  
+                    <Grid item xs={9}>
+                        {item.req === 'y' ?
+                        item.dbColumn === 'idasset' ?  
                         <TextField
                             // placeholder={item.value}
                             fullWidth
@@ -71,7 +70,7 @@ function Content({item, update}) {
                             color="secondary"
                             focused
                         /> : 
-                        item.dbColumn == 'introductiondate' ?
+                        item.dbColumn === 'introductiondate' ?
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                             <DatePicker value={value}  inputFormat={"YYYY-MM-DD"} 
                                 onChange={(newValue) => {
