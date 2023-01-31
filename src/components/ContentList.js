@@ -1,4 +1,4 @@
-import { Button, Dialog, DialogContent, DialogContentText, DialogActions, DialogTitle, List, Paper } from "@mui/material";
+import { Button, List, Paper } from "@mui/material";
 import React, { useContext, useEffect, useState } from "react";
 import Content from "./Content";
 import '../css/main.css';
@@ -21,18 +21,19 @@ function ContentList() {
     const [bModifyDisabled, setBModifyDisabled] = useState(true);
     const [btnMode, setBtnMode] = useState(true);
 
-    const [ getConfirmation, Confirmation ] = useConfirm();
+    const [ getConfirmationYN, ConfirmationYN, getConfirmationOK, ConfirmationOK ] = useConfirm();
 
-    // 자산관리번호 update 함수
-    const modifyContents = () => {
+    // 자산 초기화 함수
+    function initContentsWithAssetId() {
         let copyContents = [...contents];
-        for(let i=0; i<copyContents.length; i++) {
-            if(copyContents[i].dbColumn === 'idasset') {
+        for (let i = 0; i < copyContents.length; i++) {
+            if (copyContents[i].dbColumn === 'idasset') {
                 copyContents[i].data = managementId;
                 console.log('pk : ', copyContents[i].data);
             }
-            else if(copyContents[i].dbColumn === 'introductiondate')            
+            else if (copyContents[i].dbColumn === 'introductiondate')
                 copyContents[i].data = null;
+
             else
                 copyContents[i].data = '';
         }
@@ -40,7 +41,7 @@ function ContentList() {
         console.log('contents updated: ', contents);
 
         let info = {};
-        for(let i=0; i<copyContents.length; i++){
+        for (let i = 0; i < copyContents.length; i++) {
             info[copyContents[i].dbColumn] = copyContents[i].data;
         }
         setPwsInfo(info);
@@ -94,33 +95,38 @@ function ContentList() {
     });
     
     useEffect(() => {
-            fetch(BASE_URL+`/menu`)
-            .then(res => {
-                if(!res.ok) {alert('메뉴를 가져오지 못했습니다.');throw new Error(res.status);}
-                else {console.log(res); return res.json();}
-            })
-            .then(json => {            
-                // 메뉴등록     
-                let copyContents = [...contents];
-                for(let i=0; i<json.length; i++) {
-                    let copyContent = {};
-                    copyContent.columnName = json[i].column_comment;
-                    copyContent.dbColumn = json[i].column_name;
-                    if(json[i].column_name === 'idasset' || json[i].column_name === 'introductiondate')
-                        copyContent.req = 'y';
-                    copyContents.push(copyContent);
-                }
-                setContents(copyContents);         
-            })
-            .catch((error) => {
-                console.log('error: ' + error);
-            })
+        fetch(BASE_URL+`/menu`)
+        .then(res => {
+            if(!res.ok) {
+                throw new Error(res.status);
+            }
+            else {
+                return res.json();
+            }
+        })
+        .then(json => {            
+            // 메뉴등록     
+            console.log(json);
+            let copyContents = [...contents];
+            for(let i=0; i<json.length; i++) {
+                let copyContent = {};
+                copyContent.columnName = json[i].column_comment;
+                copyContent.dbColumn = json[i].column_name;
+                if(json[i].column_name === 'idasset' || json[i].column_name === 'introductiondate')
+                    copyContent.req = 'y';
+                copyContents.push(copyContent);
+            }
+            setContents(copyContents);  
+            console.log('자산 세부항목 정보 fetch 완료!')       
+        })
+        .catch((error) => {
+            console.log('error: ' + error);
+            getConfirmationOK(`DB에서 자산 세부항목 정보를 가져오지 못했습니다.(${error})`);
+        })
     }, []);
 
     // 자산관리번호 스캔 발생하면 자산관리번호 update 함수 호출하고 재랜더링
     useEffect(() => {
-
-        
         console.log("update : ", managementId);
                 
         if(managementId !== '') {                    
@@ -130,21 +136,19 @@ function ContentList() {
                       
                     const onRegPWS = async() => {
 
-                        const status = await getConfirmation(`${managementId} 자산을 등록하겠습니까?`);                      
-                        console.log('getConfirmation returns : ', status);
+                        const status = await getConfirmationYN(`${managementId} 자산을 등록하겠습니까?`);                      
+                        console.log('getConfirmationYN returns : ', status);
 
                         if(status) {
-                            modifyContents();
+                            initContentsWithAssetId();
                             setBtnMode(true); 
                             setBUploadDisabled(false); 
                             setBModifyDisabled(true);
                             console.log('reg returned!');
-                            return res.json();
+                            return;
                         } 
                         console.log('return null!');
-                        
-                        // TODO
-                        //setManagementId(contents[0].data);
+                        setManagementId('');
                         return;                 
                     }; 
                     onRegPWS();
@@ -165,6 +169,7 @@ function ContentList() {
             })
             .catch((error) => {
                 console.log('error: ' + error);
+                getConfirmationOK(`${managementId} 자산 조회 실패(${error})`);
             })                       
         }
     
@@ -186,15 +191,19 @@ function ContentList() {
             if(!res.ok) {
                 console.log(JSON.stringify(pwsInfo));
                 throw new Error(res.status);}
-            else { setBtnMode(true); setBUploadDisabled(true); setBModifyDisabled(false); return res.json(); }
+            else { 
+                setBtnMode(true); 
+                setBUploadDisabled(true); 
+                setBModifyDisabled(false); 
+                return res.json(); 
+            }
         })
         .then(json=>{ 
             console.log(json);
-            alert(`DB 저장 완료! - ${pwsInfo.idasset}`);
-            
+            getConfirmationOK(`${pwsInfo.idasset} DB 저장 완료!`);     
         })
         .catch(error => {
-            alert(`DB 저장 실패! - ${error}`);
+            getConfirmationOK(`${pwsInfo.idasset} DB 저장 실패(${error})`);
             console.log(error);
         });
     };
@@ -207,20 +216,30 @@ function ContentList() {
             body: JSON.stringify(pwsInfo)
         })
         .then(res => {
-            if(!res.ok) {console.log(JSON.stringify(pwsInfo));throw new Error(res.status);}
-            else {setBtnMode(true); return res.json(); }      
+            if(!res.ok) {
+                console.log(JSON.stringify(pwsInfo));
+                console.log(res);throw new Error(res.status);
+            }
+            else {
+                setBtnMode(true); 
+                return res.json(); 
+            }      
         })
-        .then(json=>{console.log(json);
+        .then(json=>{
+            console.log(json);
+            getConfirmationOK(`${pwsInfo.idasset} DB 저장 완료!`);
         })
         .catch(error => {
             console.log(error);
+            getConfirmationOK(`${pwsInfo.idasset} DB 저장 실패(${error})`);
         });
     };
 
     console.log('ContentList 리렌더링');
     return(
         <div className="wrapper" style={{border:'solid 1px', display:'flex', justifyContent:'flex-end'}}>                
-                <Confirmation />
+                <ConfirmationYN />
+                <ConfirmationOK />
                 <Paper sx={{
                   
                   width: 420,

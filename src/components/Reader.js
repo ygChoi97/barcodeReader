@@ -4,6 +4,8 @@ import CameraswitchIcon from '@mui/icons-material/Cameraswitch';
 import { BrowserMultiFormatReader, BarcodeFormat, DecodeHintType } from '@zxing/library';
 import beepScan from '../sounds/Barcode-scanner-beep-sound.mp3';
 import PwsContext from './PWS-Context';
+import useConfirm from "./useConfirm";
+
 const Reader = () => {
     const [localStream, setLocalStream] = useState();
     const [cameraDir, setCameraDir] = useState('environment');
@@ -16,12 +18,16 @@ const Reader = () => {
     const Scan = new BrowserMultiFormatReader(hints, 300);
 
     const { managementId, setManagementId } = useContext(PwsContext);
+
+    const [ , , getConfirmationOK, ConfirmationOK ] = useConfirm();
+
     const facingModeFlip = () => {
-        if(cameraDir == 'environment') setCameraDir('user');
-        if(cameraDir == 'user') setCameraDir('environment');
+        if(cameraDir === 'environment') setCameraDir('user');
+        if(cameraDir === 'user') setCameraDir('environment');
     }
     useEffect(() => {
         //setManagementId('H22N21044'); // 카메라 없는 환경 테스트
+        //Scan.stopStreams();
         navigator.mediaDevices.getUserMedia({
             video: { width:{min:320, ideal:640, max:1280}, height:{min:180, ideal:360, max:720}, facingMode: { exact: cameraDir } },
         })
@@ -30,7 +36,10 @@ const Reader = () => {
                 setLocalStream(stream);
         })
         .catch((err) => {
-            if(err.name == 'OverconstrainedError' && err.constraint == 'facingMode')  {facingModeFlip();console.log('camera direction : ', cameraDir);}
+            if(err.name === 'OverconstrainedError' && err.constraint === 'facingMode')  {
+                facingModeFlip();
+                console.log('camera direction : ', cameraDir);
+            }
         });
         return () => {
             Stop();
@@ -50,14 +59,14 @@ const Reader = () => {
 
     const isCodePWSFormat = function(str_code) {
         console.log(str_code);
-        if(str_code.length != 9) {console.log('code length is not 9.');return false;}
+        if(str_code.length !== 9) {console.log('code length is not 9.');return false;}
         
-        if(str_code.charAt(0) != 'H') {console.log(`index of 0 is not 'H'`);return false;}
+        if(str_code.charAt(0) !== 'H') {console.log(`index of 0 is not 'H'`);return false;}
         
         const ltxt = str_code.substr(1, 2);
         if(isNaN(ltxt)) {console.log('year code is not number');return false;}
 
-        if(str_code.charAt(3) != 'N') {console.log(`index of 3 is not 'N'`);return false;}
+        if(str_code.charAt(3) !== 'N') {console.log(`index of 3 is not 'N'`);return false;}
         const rtxt = str_code.substr(4, 5);
         if(isNaN(rtxt)) {console.log('last 5 character is not number.');return false;}
 
@@ -78,8 +87,13 @@ const Reader = () => {
                             scanSound.loop = false;
                             scanSound.play();
                             
-                            setText(data.getText());       
-                            setManagementId(data.getText());    // 자산관리번호 바코드 스캔 결과 Context 에 저장
+                            setText(data.getText());
+                            if(data.getText() === managementId){
+                                //alert(`스캔한 ${data.getText()} 은(는) 이미 등록 진행중인 자산관리번호입니다.`);
+                                getConfirmationOK(`스캔한 ${data.getText()} 은(는) 이미 등록 진행중인 자산관리번호입니다.`);
+                            }
+                            else       
+                                setManagementId(data.getText());    // 자산관리번호 바코드 스캔 결과 Context 에 저장
                             
                         }
                         else {
@@ -118,8 +132,10 @@ const Reader = () => {
         }
     };
 
+    console.log('Reader 렌더링');
     return (
         <div style={{border:'solid', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
+            <ConfirmationOK/>
             <div style={{display:'flex', flexDirection:'row', alignItems:'center', margin:'20px 0px'}}>
                 <video ref={Camera}id="video"/>
         

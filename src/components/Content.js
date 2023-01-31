@@ -72,13 +72,17 @@ function Content({item, update}) {
                         /> : 
                         item.dbColumn === 'introductiondate' ?
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            <DatePicker value={value}  inputFormat={"YYYY-MM-DD"} 
+                            <DatePicker value={value}  inputFormat={"YYYY-MM-DD"} showToolbar
                                 onChange={(newValue) => {
                                 setValue(newValue);
-                                item.data = newValue.format("YYYY-MM-DD");
-                                update(item);
-                                console.log(newValue);
-                                //item.data = newValue;
+                               
+                                if(newValue != null) {
+                                    item.data = newValue.format("YYYY-MM-DD");
+                                    update(item);
+                                    console.log(newValue);
+                                }
+                                else
+                                    item.data = null;
                             }}
                             renderInput={(params) => <TextField size="small" {...params} />}
                             />
