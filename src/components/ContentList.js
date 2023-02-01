@@ -237,7 +237,7 @@ function ContentList() {
 
     console.log('ContentList 리렌더링');
     return(
-        <div className="wrapper" style={{border:'solid 1px', display:'flex', justifyContent:'flex-end'}}>                
+        <div className="wrapper" style={{border:'solid 1px', display:'flex', justifyContent:'flex-end', width: '30%'}}>                
                 <ConfirmationYN />
                 <ConfirmationOK />
                 <Paper sx={{

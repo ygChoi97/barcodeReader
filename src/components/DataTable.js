@@ -24,6 +24,9 @@ import { visuallyHidden } from '@mui/utils';
 import { useEffect } from 'react';
 import { useState } from 'react';
 
+import PwsContext from "./PWS-Context";
+import { useContext } from 'react';
+
 const BASE_URL = 'http://localhost:8181/api/pws';
 
 function descendingComparator(a, b, orderBy) {
@@ -58,46 +61,96 @@ function stableSort(array, comparator) {
   return stabilizedThis.map((el) => el[0]);
 }
 
-const headCells = [
-  {
-    id: 'name',
-    numeric: false,
-    disablePadding: true,
-    label: 'Dessert (100g serving)',
-  },
-  {
-    id: 'calories',
-    numeric: true,
-    disablePadding: false,
-    label: 'Calories',
-  },
-  {
-    id: 'fat',
-    numeric: true,
-    disablePadding: false,
-    label: 'Fat (g)',
-  },
-  {
-    id: 'carbs',
-    numeric: true,
-    disablePadding: false,
-    label: 'Carbs (g)',
-  },
-  {
-    id: 'protein',
-    numeric: true,
-    disablePadding: false,
-    label: 'Protein (g)',
-  },
-];
+// const headCells = [
+//   {
+//     id: 'name',
+//     numeric: false,
+//     disablePadding: true,
+//     label: 'Dessert (100g serving)',
+//   },
+//   {
+//     id: 'calories',
+//     numeric: true,
+//     disablePadding: false,
+//     label: 'Calories',
+//   },
+//   {
+//     id: 'fat',
+//     numeric: true,
+//     disablePadding: false,
+//     label: 'Fat (g)',
+//   },
+//   {
+//     id: 'carbs',
+//     numeric: true,
+//     disablePadding: false,
+//     label: 'Carbs (g)',
+//   },
+//   {
+//     id: 'protein',
+//     numeric: true,
+//     disablePadding: false,
+//     label: 'Protein (g)',
+//   },
+// ];
+
+
 
 function EnhancedTableHead(props) {
-  const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort } =
+  // const headCells1 = [
+  //   {
+  //     id: 'name',
+  //     numeric: false,
+  //     disablePadding: true,
+  //     label: 'Dessert (100g serving)',
+  //   },
+  //   {
+  //     id: 'calories',
+  //     numeric: true,
+  //     disablePadding: false,
+  //     label: 'Calories',
+  //   },
+  //   {
+  //     id: 'fat',
+  //     numeric: true,
+  //     disablePadding: false,
+  //     label: 'Fat (g)',
+  //   },
+  //   {
+  //     id: 'carbs',
+  //     numeric: true,
+  //     disablePadding: false,
+  //     label: 'Carbs (g)',
+  //   },
+  //   {
+  //     id: 'protein',
+  //     numeric: true,
+  //     disablePadding: false,
+  //     label: 'Protein (g)',
+  //   },
+  // ];
+
+  
+  
+  const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, pws_item } =
     props;
+
+
+  const headCells = pws_item.map(itm => {
+    let obj = {id:'', numeric:false, disablePadding:false, label:''};
+    obj.id = itm.column_name;
+    // if(itm.column_name === 'userid')
+    //   obj.numeric = true;
+    obj.label = itm.column_comment;
+    return obj;
+  });
+
   const createSortHandler = (property) => (event) => {
     onRequestSort(event, property);
   };
 
+  console.log("pass through item : ", pws_item);
+  console.log("headCells : ", headCells);
   return (
     <TableHead>
       <TableRow>
@@ -145,6 +198,10 @@ EnhancedTableHead.propTypes = {
   order: PropTypes.oneOf(['asc', 'desc']).isRequired,
   orderBy: PropTypes.string.isRequired,
   rowCount: PropTypes.number.isRequired,
+  pws_item: PropTypes.shape([{
+    column_name: PropTypes.string,
+    column_comment: PropTypes.string
+  }])
 };
 
 function EnhancedTableToolbar(props) {
@@ -177,7 +234,7 @@ function EnhancedTableToolbar(props) {
           id="tableTitle"
           component="div"
         >
-          Nutrition
+          PWS List
         </Typography>
       )}
 
@@ -204,20 +261,21 @@ EnhancedTableToolbar.propTypes = {
 
 export default function EnhancedTable({item}) {
   const [order, setOrder] = React.useState('asc');
-  const [orderBy, setOrderBy] = React.useState('calories');
+  //const [orderBy, setOrderBy] = React.useState('calories');
+  const [orderBy, setOrderBy] = React.useState('idasset');
   const [selected, setSelected] = React.useState([]);
   const [page, setPage] = React.useState(0);
-  const [dense, setDense] = React.useState(false);
-  const [rowsPerPage, setRowsPerPage] = React.useState(5);
+  const [dense, setDense] = React.useState(true);
+  const [rowsPerPage, setRowsPerPage] = React.useState(20);
 
   const [contents, setContents] = useState([]);
-
+  const { managementId, setManagementId } = useContext(PwsContext);
 //   function createData(name, calories, fat, carbs, protein) {
 //   console.log({name,
 //     calories,
 //     fat,
 //     carbs,
-//     protein,});
+//     protein,});rows
 //   return {
 //     name,
 //     calories,
@@ -230,13 +288,27 @@ export default function EnhancedTable({item}) {
   function createData(...param) {
     let obj = {};
     for(let i =0; i<item.length; i++) {
-      obj[item[i]] = param[i];
+      obj[item[i].column_name] = param[i];
     }
-    console.log(obj);
+    // console.log(obj);
     return obj;
   }
   
-  const rows = [
+  // const rows = contents.map(pws => {
+  //   let obj = [];
+  //   for(let name in pws) {
+  //     if(name === 'userid')
+  //       parseInt(obj.push(pws[name]));
+  //     obj.push(pws[name]);
+      
+  //   }
+    
+  //   return createData(...obj);
+  // });
+
+  const rows = [...contents];
+
+  const rows1 = [
     createData('Cupcake', 305, 3.7, 67, 4.3),
     createData('Donut', 452, 25.0, 51, 4.9),
     createData('Eclair', 262, 16.0, 24, 6.0),
@@ -260,19 +332,20 @@ export default function EnhancedTable({item}) {
 
   const handleSelectAllClick = (event) => {
     if (event.target.checked) {
-      const newSelected = rows.map((n) => n.name);
+      // const newSelected = rows.map((n) => n.name);
+      const newSelected = rows.map((n) => n.idasset);
       setSelected(newSelected);
       return;
     }
     setSelected([]);
   };
 
-  const handleClick = (event, name) => {
-    const selectedIndex = selected.indexOf(name);
+  const handleClick = (event, idasset) => {
+    const selectedIndex = selected.indexOf(idasset);
     let newSelected = [];
-
+  
     if (selectedIndex === -1) {
-      newSelected = newSelected.concat(selected, name);
+      newSelected = newSelected.concat(selected, idasset);
     } else if (selectedIndex === 0) {
       newSelected = newSelected.concat(selected.slice(1));
     } else if (selectedIndex === selected.length - 1) {
@@ -285,6 +358,10 @@ export default function EnhancedTable({item}) {
     }
 
     setSelected(newSelected);
+  };
+
+  const handleRowClick = (event, idasset) => {
+    setManagementId(idasset);
   };
 
   const handleChangePage = (event, newPage) => {
@@ -317,18 +394,42 @@ export default function EnhancedTable({item}) {
       }
     })
     .then(json => { 
-
+       let copyContents = [...contents];
+       for(let i=0; i<json.count; i++) {
+           //console.log(json.pwsDtos[i]);
+           let copyContent = {};
+           if(json.pwsDtos[i].introductiondate != null || json.pwsDtos[i].introductiondate != undefined) {
+            let ddd = new Date(json.pwsDtos[i].introductiondate)
+            console.log(ddd.getFullYear(),'-', ddd.getMonth(),'-',ddd.getMonth());
+            
+           }
+            //console.log(json.pwsDtos[i].introductiondate);
+           copyContent = json.pwsDtos[i]
+           copyContents.push(copyContent);
+       }
+       setContents(copyContents);  
+      
+      //setContents(json.pwsDtos);
+      // console.log(copyContents[0]);
+      // console.log(copyContents[json.count-1]);
+      console.log('all data');
     })
   
   }, []);
-
+  console.log('rows : ', rows[0]);
   return (
-    <Box sx={{ width: '100%' }}>
-      <Paper sx={{ width: '100%', mb: 2 }}>
+    <Box sx={{ width: '100%' }} style={{overflow: 'auto'}}>
+      <Paper sx={{ width: '4000px', mb: 2 }} style={{display:'flex', flexDirection: 'column', alignItems:'flex-start'}}>
         <EnhancedTableToolbar numSelected={selected.length} />
         <TableContainer>
           <Table
-            sx={{ minWidth: 750 }}
+            sx={{ minWidth: 750,
+            borderBottom: "2px solid black",
+            "& th": {
+              fontSize: ".8rem",
+              fontWeight: 900
+
+            }}}
             aria-labelledby="tableTitle"
             size={dense ? 'small' : 'medium'}
           >
@@ -339,26 +440,33 @@ export default function EnhancedTable({item}) {
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
               rowCount={rows.length}
+              pws_item = {item}
             />
             <TableBody>
               {stableSort(rows, getComparator(order, orderBy))
                 .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                 .map((row, index) => {
-                  const isItemSelected = isSelected(row.name);
+                  // const isItemSelected = isSelected(row.name);
+                  const isItemSelected = isSelected(row.idasset);
                   const labelId = `enhanced-table-checkbox-${index}`;
-
+                  
                   return (
                     <TableRow
                       hover
-                      onClick={(event) => handleClick(event, row.name)}
+                      
+                      onClick={(event) => handleRowClick(event, row.idasset)}
+                      
                       role="checkbox"
                       aria-checked={isItemSelected}
                       tabIndex={-1}
-                      key={row.name}
+                      // key={row.name}
+                      key={row.idasset}
                       selected={isItemSelected}
+                      
                     >
                       <TableCell padding="checkbox">
                         <Checkbox
+                          onClick={(event) => handleClick(event, row.idasset)}
                           color="primary"
                           checked={isItemSelected}
                           inputProps={{
@@ -367,17 +475,39 @@ export default function EnhancedTable({item}) {
                         />
                       </TableCell>
                       <TableCell
-                        component="th"
+                        // component="th"
                         id={labelId}
                         scope="row"
                         padding="none"
+                        sx={{fontSize: "0.8rem", width:'136px'}}
                       >
-                        {row.name}
+                        {/* {row.name} */}
+                        {row.idasset}
+                          
                       </TableCell>
-                      <TableCell align="right">{row.calories}</TableCell>
-                      <TableCell align="right">{row.fat}</TableCell>
-                      <TableCell align="right">{row.carbs}</TableCell>
-                      <TableCell align="right">{row.protein}</TableCell>
+
+                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.uptake}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.company}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.headquarters}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.center}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.department}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.username}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.userid}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.centercd}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.model}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.assetno}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.sn}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.graphic}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.monitor}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.area}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.building}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.storey}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.location}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.objpurchase}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.objuse}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.introductiondate}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.note}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.desctask}</TableCell>
                     </TableRow>
                   );
                 })}
@@ -387,14 +517,14 @@ export default function EnhancedTable({item}) {
                     height: (dense ? 33 : 53) * emptyRows,
                   }}
                 >
-                  <TableCell colSpan={6} />
+                  <TableCell colSpan={1} />
                 </TableRow>
               )}
             </TableBody>
           </Table>
         </TableContainer>
         <TablePagination
-          rowsPerPageOptions={[5, 10, 25]}
+          rowsPerPageOptions={[10, 20, 50, 100, 200]}
           component="div"
           count={rows.length}
           rowsPerPage={rowsPerPage}

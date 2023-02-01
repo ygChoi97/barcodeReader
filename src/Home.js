@@ -9,8 +9,8 @@ function Home() {
         <PwsContext.Provider value={value}>
             <h2>{managementId}</h2>
             <div className="wrapper" style={{width:'100%', display:'flex', flexDirection:'row', justifyContent:'space-between', alignItems:'flex-start', border:'solid 3px'}}>
-                <ScannerBtn/>
-                <ContentList/>
+                <ScannerBtn />
+                <ContentList />
             </div>
         </PwsContext.Provider>
     );

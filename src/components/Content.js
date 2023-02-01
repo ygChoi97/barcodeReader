@@ -39,6 +39,7 @@ function Content({item, update}) {
     };
     
     console.log(`${item.dbColumn} ${value} 리렌더링`);
+
     return(
         <ListItem 
         sx={{
@@ -62,6 +63,7 @@ function Content({item, update}) {
                             label={item.columnName}
                             InputProps={{
                                 readOnly: true,
+                                style: {fontSize: 12, fontWeight: 600}
                               }}
                             defaultValue={''}
                             variant = "standard"
@@ -92,6 +94,7 @@ function Content({item, update}) {
                             requierd='true'
                             id="outlined-required"
                             //label={item.columnName}
+                            inputProps={{style: {fontSize: 12, fontWeight: 400}}}
                             defaultValue=''
                             value = {item.data}
                             onChange={handleChangeInput}
@@ -101,6 +104,7 @@ function Content({item, update}) {
                         //placeholder={item.value}
                         fullWidth
                         id="standard-basic"
+                        inputProps={{style: {fontSize: 12, fontWeight: 400}}}
                         //label={item.columnName}
                         defaultValue=''
                         value = {item.data}

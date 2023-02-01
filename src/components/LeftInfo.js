@@ -19,7 +19,7 @@ function LeftInfo({item}) {
         .then(json => {
           let copyMenu = [];
           for(let i=0; i<json.length; i++) {
-            copyMenu.push(json[i].column_name);
+            copyMenu.push(json[i]);
           }
           setMenu(copyMenu);
           console.log(copyMenu);
