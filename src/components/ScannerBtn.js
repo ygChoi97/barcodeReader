@@ -10,7 +10,8 @@ function ScannerBtn() {
     }
 
     return(
-        <div className="wrapper" style={{border:'solid 1px', width: '70%'}}>
+        // <div className="wrapper" style={{border:'solid 1px', width: '70%'}}>
+        <div className="wrapper" style={{width: '100%', position: 'relative', zIndex: 1}}>
 
             <div>
             { doScan ?

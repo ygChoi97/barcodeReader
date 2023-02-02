@@ -383,6 +383,22 @@ export default function EnhancedTable({item}) {
   const emptyRows =
     page > 0 ? Math.max(0, (1 + page) * rowsPerPage - rows.length) : 0;
 
+  function dateFormat(date) {
+    let month = date.getMonth() + 1;
+    let day = date.getDate();
+    let hour = date.getHours();
+    let minute = date.getMinutes();
+    let second = date.getSeconds();
+
+    month = month >= 10 ? month : '0' + month;
+    day = day >= 10 ? day : '0' + day;
+    hour = hour >= 10 ? hour : '0' + hour;
+    minute = minute >= 10 ? minute : '0' + minute;
+    second = second >= 10 ? second : '0' + second;
+
+    return date.getFullYear() + '-' + month + '-' + day;
+  }
+
   useEffect(() => {
     fetch(BASE_URL)
     .then(res => {
@@ -398,13 +414,14 @@ export default function EnhancedTable({item}) {
        for(let i=0; i<json.count; i++) {
            //console.log(json.pwsDtos[i]);
            let copyContent = {};
-           if(json.pwsDtos[i].introductiondate != null || json.pwsDtos[i].introductiondate != undefined) {
-            let ddd = new Date(json.pwsDtos[i].introductiondate)
-            console.log(ddd.getFullYear(),'-', ddd.getMonth(),'-',ddd.getMonth());
-            
+           copyContent = json.pwsDtos[i]
+           if(json.pwsDtos[i].introductiondate !== null || json.pwsDtos[i].introductiondate != undefined) {
+            let day = new Date(json.pwsDtos[i].introductiondate);
+            copyContent['introductiondate'] = dateFormat(day);
+
            }
             //console.log(json.pwsDtos[i].introductiondate);
-           copyContent = json.pwsDtos[i]
+           
            copyContents.push(copyContent);
        }
        setContents(copyContents);  
@@ -426,7 +443,7 @@ export default function EnhancedTable({item}) {
             sx={{ minWidth: 750,
             borderBottom: "2px solid black",
             "& th": {
-              fontSize: ".8rem",
+              fontSize: ".75rem",
               fontWeight: 900
 
             }}}
@@ -479,35 +496,35 @@ export default function EnhancedTable({item}) {
                         id={labelId}
                         scope="row"
                         padding="none"
-                        sx={{fontSize: "0.8rem", width:'136px'}}
+                        sx={{fontSize: ".6rem", width:'136px'}}
                       >
                         {/* {row.name} */}
                         {row.idasset}
                           
                       </TableCell>
 
-                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.uptake}</TableCell>
-                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.company}</TableCell>
-                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.headquarters}</TableCell>
-                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.center}</TableCell>
-                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.department}</TableCell>
-                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.username}</TableCell>
-                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.userid}</TableCell>
-                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.centercd}</TableCell>
-                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.model}</TableCell>
-                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.assetno}</TableCell>
-                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.sn}</TableCell>
-                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.graphic}</TableCell>
-                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.monitor}</TableCell>
-                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.area}</TableCell>
-                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.building}</TableCell>
-                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.storey}</TableCell>
-                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.location}</TableCell>
-                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.objpurchase}</TableCell>
-                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.objuse}</TableCell>
-                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.introductiondate}</TableCell>
-                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.note}</TableCell>
-                      <TableCell align="left" sx={{fontSize: "0.8rem"}}>{row.desctask}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.uptake}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.company}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.headquarters}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.center}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.department}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.username}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.userid}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.centercd}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.model}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.assetno}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.sn}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.graphic}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.monitor}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.area}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.building}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.storey}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.location}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.objpurchase}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.objuse}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.introductiondate}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.note}</TableCell>
+                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.desctask}</TableCell>
                     </TableRow>
                   );
                 })}
@@ -533,10 +550,10 @@ export default function EnhancedTable({item}) {
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
       </Paper>
-      <FormControlLabel
+      {/* <FormControlLabel
         control={<Switch checked={dense} onChange={handleChangeDense} />}
         label="Dense padding"
-      />
+      /> */}
     </Box>
   );
 }

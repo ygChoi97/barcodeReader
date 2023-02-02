@@ -26,7 +26,8 @@ function LeftInfo({item}) {
         })
       },[]);
     return(
-        <div className="wrapper" style={{border:'solid 1px'}}>
+        // <div className="wrapper" style={{border:'solid 1px'}}>
+        <div className="wrapper">
             {
             item ? 
                 <Reader/>

@@ -2,9 +2,11 @@ import { Button, List, Paper } from "@mui/material";
 import React, { useContext, useEffect, useState } from "react";
 import Content from "./Content";
 import '../css/main.css';
+import '../css/contentlist.css';
 import PwsContext from "./PWS-Context";
 
 import useConfirm from "./useConfirm";
+import zIndex from "@mui/material/styles/zIndex";
 
 const BASE_URL = 'http://localhost:8181/api/pws';
 
@@ -22,6 +24,11 @@ function ContentList() {
     const [btnMode, setBtnMode] = useState(true);
 
     const [ getConfirmationYN, ConfirmationYN, getConfirmationOK, ConfirmationOK ] = useConfirm();
+
+    const [isOpen, setMenu] = useState(false);
+    const toggleMenu = () => {
+        setMenu(isOpen => !isOpen); // on,off 개념 boolean
+    }
 
     // 자산 초기화 함수
     function initContentsWithAssetId() {
@@ -170,7 +177,9 @@ function ContentList() {
             .catch((error) => {
                 console.log('error: ' + error);
                 getConfirmationOK(`${managementId} 자산 조회 실패(${error})`);
-            })                       
+            })  
+            
+            setMenu(true);
         }
     
     },[managementId]);
@@ -235,23 +244,46 @@ function ContentList() {
         });
     };
 
+    const style1 = {
+ 
+        display:'flex', 
+        justifyContent:'flex-end', 
+        width: '30%', 
+        visibility: 'visible', 
+        position:'absolute', 
+        zIndex: 2, 
+        right: '-30%'
+        
+    }
+
+    const onClickDisappearHanler = (e) => {
+        setMenu(false);
+    };
     console.log('ContentList 리렌더링');
     return(
-        <div className="wrapper" style={{border:'solid 1px', display:'flex', justifyContent:'flex-end', width: '30%'}}>                
+         <div className={isOpen ? "show-list" : "hide-list"}>
                 <ConfirmationYN />
                 <ConfirmationOK />
+                <Button variant="contained" sx={{ border: 'solid 1px', width: 20, height:19, padding: 1, m: 0.3 }} onClick={onClickDisappearHanler}>&lt;&lt;</Button>
                 <Paper sx={{
-                  
+                    
+
                   width: 420,
-                //   backgroundColor: (theme) =>
-                //     theme.palette.mode === 'dark' ? '#1A2027' : '#ff3',
-                }}>
+                  borderRadius: 5, borderColor: "#000",
+                   backgroundColor: (theme) =>
+                     theme.palette.mode === 'dark' ? '#1A2027' : '#FFFFF0',
+                }} elevation={8}>
                     <List>
                         {items}
                     </List>
-                    <Button variant="contained" color="secondary" sx={{ width: 80, height:27, padding: 1, margin: 1 }} disabled={Boolean(bUploadDisabled | btnMode)} onClick={onClickUploadHandler}>upload</Button>
-                    <Button variant="contained" sx={{ width: 80, height:27, padding: 1, margin: 1 }} disabled={Boolean(bModifyDisabled | btnMode)} onClick={onClickModifyHandler}>modify</Button>
+                    <div style={{border: 'solid 1px', display: 'flex', justifyContent: 'center'}}>
+                    <Button variant="contained" color="secondary" sx={{ width: 80, height:19, padding: 1, mb: 1, mr: 1 }} disabled={Boolean(bUploadDisabled | btnMode)} onClick={onClickUploadHandler}>upload</Button>
+                    <Button variant="contained" sx={{ width: 80, height:19, padding: 1, mb: 1, mr: 1 }} disabled={Boolean(bModifyDisabled | btnMode)} onClick={onClickModifyHandler}>modify</Button>
+                    </div>
                 </Paper>
+                
+                
+                
         </div>
     );
 }

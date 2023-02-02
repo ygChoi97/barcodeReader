@@ -25,7 +25,7 @@ function Content({item, update}) {
         typography: {
           // In Chinese and Japanese the characters are usually larger,
           // so a smaller fontsize may be appropriate.
-          fontSize: 8,
+          fontSize: 9,
           
         },
     });
@@ -43,13 +43,13 @@ function Content({item, update}) {
     return(
         <ListItem 
         sx={{
-            height: 39}}
+            height: 32}}
             >
             
             <Grid container spacing={1} alignItems="center">
                 <ThemeProvider theme={theme}>
                     <Grid item xs={3}>            
-                        <Typography sx = {{fontSize:12, fontWeight:600}}>
+                        <Typography sx = {{fontWeight:600}}>
                             {item.columnName}
                         </Typography>        
                     </Grid>
@@ -63,7 +63,7 @@ function Content({item, update}) {
                             label={item.columnName}
                             InputProps={{
                                 readOnly: true,
-                                style: {fontSize: 12, fontWeight: 600}
+                                style: { height: 12, fontSize:12, fontWeight: 600 }
                               }}
                             defaultValue={''}
                             variant = "standard"
@@ -94,7 +94,7 @@ function Content({item, update}) {
                             requierd='true'
                             id="outlined-required"
                             //label={item.columnName}
-                            inputProps={{style: {fontSize: 12, fontWeight: 400}}}
+                            inputProps={{style: {height: 7, fontSize:9, fontWeight: 400}}}
                             defaultValue=''
                             value = {item.data}
                             onChange={handleChangeInput}
@@ -104,7 +104,7 @@ function Content({item, update}) {
                         //placeholder={item.value}
                         fullWidth
                         id="standard-basic"
-                        inputProps={{style: {fontSize: 12, fontWeight: 400}}}
+                        inputProps={{style: {height: 7, fontSize:9, fontWeight: 400}}}
                         //label={item.columnName}
                         defaultValue=''
                         value = {item.data}
