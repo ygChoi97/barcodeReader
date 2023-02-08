@@ -23,11 +23,34 @@ function Content({item, update}) {
     
     const theme = createTheme({
         typography: {
-          // In Chinese and Japanese the characters are usually larger,
-          // so a smaller fontsize may be appropriate.
-          fontSize: 9,
-          
-        },
+            fontFamily: [
+              '-apple-system',
+              'BlinkMacSystemFont',
+              '"Segoe UI"',
+              'Roboto',
+              '"Helvetica Neue"',
+              'Arial',
+              'sans-serif',
+              '"Apple Color Emoji"',
+              '"Segoe UI Emoji"',
+              '"Segoe UI Symbol"',
+            ].join(','),
+            fontSize: 9,
+          },
+        // palette: {
+        //     primary: {
+        //       main: purple[500],
+        //     },
+        //     secondary: {
+        //       main: blueGrey[400],
+        //     },
+        //   },
+        components:{
+            MuiTextField: {
+
+            },
+            
+        }
     });
     
     const handleChangeInput = (e) => {
@@ -39,7 +62,8 @@ function Content({item, update}) {
     };
     
     console.log(`${item.dbColumn} ${value} 리렌더링`);
-
+    const color = "#399939";
+    
     return(
         <ListItem 
         sx={{
@@ -49,7 +73,9 @@ function Content({item, update}) {
             <Grid container spacing={1} alignItems="center">
                 <ThemeProvider theme={theme}>
                     <Grid item xs={3}>            
-                        <Typography sx = {{fontWeight:600}}>
+                        <Typography 
+                            sx = {{fontWeight:600}}
+                        >
                             {item.columnName}
                         </Typography>        
                     </Grid>
@@ -75,9 +101,9 @@ function Content({item, update}) {
                         item.dbColumn === 'introductiondate' ?
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
                             <DatePicker value={value}  inputFormat={"YYYY-MM-DD"} showToolbar
-                                onChange={(newValue) => {
+                            onChange={(newValue) => {
                                 setValue(newValue);
-                               
+                                                                
                                 if(newValue != null) {
                                     item.data = newValue.format("YYYY-MM-DD");
                                     update(item);
@@ -86,7 +112,13 @@ function Content({item, update}) {
                                 else
                                     item.data = null;
                             }}
-                            renderInput={(params) => <TextField size="small" {...params} />}
+                            renderInput={(params) => <TextField size="small" {...params} 
+                            sx={{
+                                svg: { color },
+                                input: { color },
+                                label: { color }
+                              }}
+                              />}
                             />
                           </LocalizationProvider> :
                         <TextField

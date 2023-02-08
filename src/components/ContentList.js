@@ -6,7 +6,6 @@ import '../css/contentlist.css';
 import PwsContext from "./PWS-Context";
 
 import useConfirm from "./useConfirm";
-import zIndex from "@mui/material/styles/zIndex";
 
 const BASE_URL = 'http://localhost:8181/api/pws';
 

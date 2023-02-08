@@ -1,4 +1,4 @@
-import { AddAPhotoOutlined, AddAPhotoRounded, AddAPhotoTwoTone, LinkedCameraRounded } from "@mui/icons-material";
+import { AddAPhotoRounded,  LinkedCameraRounded } from "@mui/icons-material";
 import React, { useState } from "react";
 import LeftInfo from "./LeftInfo";
 
@@ -19,9 +19,8 @@ function ScannerBtn() {
                 :
                 <AddAPhotoRounded  sx={{ fontSize: 25 }} onClick={onToggleScanHandler}/>
             }
-            </div>
-                
-            
+            </div>           
+           
             <div>
                 <LeftInfo item={doScan}/>
             </div>

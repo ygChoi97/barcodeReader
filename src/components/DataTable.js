@@ -16,8 +16,6 @@ import Paper from '@mui/material/Paper';
 import Checkbox from '@mui/material/Checkbox';
 import IconButton from '@mui/material/IconButton';
 import Tooltip from '@mui/material/Tooltip';
-import FormControlLabel from '@mui/material/FormControlLabel';
-import Switch from '@mui/material/Switch';
 import DeleteIcon from '@mui/icons-material/Delete';
 import FilterListIcon from '@mui/icons-material/FilterList';
 import { visuallyHidden } from '@mui/utils';
@@ -26,6 +24,7 @@ import { useState } from 'react';
 
 import PwsContext from "./PWS-Context";
 import { useContext } from 'react';
+import { Button } from '@mui/material';
 
 const BASE_URL = 'http://localhost:8181/api/pws';
 
@@ -270,6 +269,9 @@ export default function EnhancedTable({item}) {
 
   const [contents, setContents] = useState([]);
   const { managementId, setManagementId } = useContext(PwsContext);
+
+
+  const fileInput = React.useRef(null);
 //   function createData(name, calories, fat, carbs, protein) {
 //   console.log({name,
 //     calories,
@@ -429,15 +431,87 @@ export default function EnhancedTable({item}) {
       //setContents(json.pwsDtos);
       // console.log(copyContents[0]);
       // console.log(copyContents[json.count-1]);
-      console.log('all data');
+      console.log('all data : ', contents);
     })
   
   }, []);
+  const excelExportHandler = (e) => {
+    let obj = {};
+    let copyContents = [...contents];
+    for(let i =0; i<item.length; i++)
+      obj[item[i].column_name] = item[i].column_comment;
+    
+    copyContents.unshift(obj);
+    console.log(copyContents);
+
+    const xlsx = require( "xlsx" );
+
+    const write_opts = {
+      type: "buffer",
+      cellDates: false,
+      bookSST: false,
+      bookType: "xlsx",
+      sheet: "Sheet1",
+      compression: false,
+      Props: {
+        Author: "Someone",
+        Company: "SheetJS LLC"
+      }
+    };
+
+    const assets = xlsx.utils.json_to_sheet( copyContents, { header : item.map((it)=>{return it.column_name}), skipHeader : true } );
+
+    const book = xlsx.utils.book_new();
+    assets["!cols"] = [
+      { wpx : 70 }    // 자산관리번호
+    , { wpx : 50 }    // 사용구분
+    , { wpx : 40 }    // 회사
+    , { wpx : 100 }   // 본부
+    , { wpx : 130 }   // 센터
+    , { wpx : 120 }   // 관리부서
+    , { wpx : 60 }    // 사용자
+    , { wpx : 60 }    // 사용자ID
+    , { wpx : 100 }   // 코스트센터CD
+    , { wpx : 60 }    // 모델명
+    , { wpx : 70 }    // 자산번호
+    , { wpx : 80 }    // S/N
+    , { wpx : 60 }    // 그래픽카드
+    , { wpx : 60 }    // 모니터
+    , { wpx : 70 }    // 지역
+    , { wpx : 80 }    // 건물명
+    , { wpx : 40 }    // 층수
+    , { wpx : 100 }   // 상세위치
+    , { wpx : 50 }    // 구매용도
+    , { wpx : 50 }    // 사용용도
+    , { wpx : 70 }    // 도입년월
+    , { wpx : 120 }   // 비고
+    , { wpx : 120 }   // 상세업무
+  ]
+
+    xlsx.utils.book_append_sheet( book, assets, "자산리스트" );
+    
+    //getDir();
+    //fileInput.current.click();
+    xlsx.writeFile( book, "pws_list.xlsx"); 
+
+  };
+  const handleChange = e => {
+    console.log(e.target.files[0]);
+  };
+  async function getDir() {
+    const dirHandle = await window.showFilePicker();
+  
+    // run code for dirHandle
+  }
   console.log('rows : ', rows[0]);
   return (
     <Box sx={{ width: '100%' }} style={{overflow: 'auto'}}>
       <Paper sx={{ width: '4000px', mb: 2 }} style={{display:'flex', flexDirection: 'column', alignItems:'flex-start'}}>
+        <div style={{display:'flex', flexDirection:'row', alignItems:'center'}}>
         <EnhancedTableToolbar numSelected={selected.length} />
+        <Button variant='contained' sx={{ width: 145, height:29}} onClick={excelExportHandler}>excel export</Button>
+        <input type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ref={fileInput} onChange={handleChange} style={{ display: "none" }} />
+        </div>
         <TableContainer>
           <Table
             sx={{ minWidth: 750,
