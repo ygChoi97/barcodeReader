@@ -5,8 +5,9 @@ import { BrowserMultiFormatReader, BarcodeFormat, DecodeHintType } from '@zxing/
 import beepScan from '../sounds/Barcode-scanner-beep-sound.mp3';
 import PwsContext from './PWS-Context';
 import useConfirm from "./useConfirm";
+import "../css/reader.css";
 
-const Reader = () => {
+const Reader = ({doScan}) => {
     const [localStream, setLocalStream] = useState();
     const [cameraDir, setCameraDir] = useState('environment');
     const [text, setText] = useState('');
@@ -49,7 +50,7 @@ const Reader = () => {
         if (!Camera.current)
             return;
         if (localStream && Camera.current) {
-            Scanning();
+            Scanning();         
         }
         return () => {
             Stop();
@@ -77,7 +78,6 @@ const Reader = () => {
     const Scanning = async () => {
         // const t = await Scan.decodeOnce();
         console.log('scan');
-        
         if (localStream && Camera.current) {
             try {
                 const data = await Scan.decodeFromStream(localStream, Camera.current, (data, err) => {
@@ -102,8 +102,9 @@ const Reader = () => {
                     }
                     else {
                         ; //setText("");
-                    }
+                    }                    
                 });
+                
             }
             catch (error) {
                 console.log(error);
@@ -130,11 +131,11 @@ const Reader = () => {
             console.log('environment');
             setCameraDir('environment');
         }
-    };
-
+    };   
     console.log('Reader 렌더링');
+    
     return (
-        <div style={{border:'solid', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
+        <div className={doScan ? "show-reader" : "hide-reader"} style={{border:'solid', display:'flex', flexDirection:'column', justifyContent:'center', alignItems:'center'}}>
             <ConfirmationOK/>
             <div style={{display:'flex', flexDirection:'row', alignItems:'center', margin:'20px 0px'}}>
                 <video ref={Camera}id="video"/>
@@ -145,6 +146,6 @@ const Reader = () => {
                 <p>{text}</p>
             </div>
         </div>
-        );
+    );
 };
 export default Reader;

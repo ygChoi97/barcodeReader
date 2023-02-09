@@ -26,6 +26,11 @@ import PwsContext from "./PWS-Context";
 import { useContext } from 'react';
 import { Button } from '@mui/material';
 
+import { Spinner } from 'reactstrap';
+import 'bootstrap/dist/css/bootstrap.min.css';
+import useConfirm from "./useConfirm";
+import "../css/datatable.css";
+
 const BASE_URL = 'http://localhost:8181/api/pws';
 
 function descendingComparator(a, b, orderBy) {
@@ -258,7 +263,7 @@ EnhancedTableToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
 };
 
-export default function EnhancedTable({item}) {
+const EnhancedTable = function({doScan}) {
   const [order, setOrder] = React.useState('asc');
   //const [orderBy, setOrderBy] = React.useState('calories');
   const [orderBy, setOrderBy] = React.useState('idasset');
@@ -269,8 +274,9 @@ export default function EnhancedTable({item}) {
 
   const [contents, setContents] = useState([]);
   const { managementId, setManagementId } = useContext(PwsContext);
-
-
+  const [loading, setLoading] = useState(true);
+  const [ getConfirmationYN, ConfirmationYN, getConfirmationOK, ConfirmationOK ] = useConfirm();
+  const [menu, setMenu] = React.useState([]);
   const fileInput = React.useRef(null);
 //   function createData(name, calories, fat, carbs, protein) {
 //   console.log({name,
@@ -289,8 +295,8 @@ export default function EnhancedTable({item}) {
 
   function createData(...param) {
     let obj = {};
-    for(let i =0; i<item.length; i++) {
-      obj[item[i].column_name] = param[i];
+    for(let i =0; i<menu.length; i++) {
+      obj[menu[i].column_name] = param[i];
     }
     // console.log(obj);
     return obj;
@@ -402,6 +408,24 @@ export default function EnhancedTable({item}) {
   }
 
   useEffect(() => {
+    fetch(BASE_URL+`/menu`)
+        .then(res => {
+            if(!res.ok) {
+                throw new Error(res.status);
+            }
+            else { 
+                return res.json();
+            }
+        })
+        .then(json => {
+          let copyMenu = [];
+          for(let i=0; i<json.length; i++) {
+            copyMenu.push(json[i]);
+          }
+          setMenu(copyMenu);
+          console.log(copyMenu);
+      });
+    
     fetch(BASE_URL)
     .then(res => {
       if(!res.ok) {
@@ -428,6 +452,7 @@ export default function EnhancedTable({item}) {
        }
        setContents(copyContents);  
       
+       setLoading(false);
       //setContents(json.pwsDtos);
       // console.log(copyContents[0]);
       // console.log(copyContents[json.count-1]);
@@ -438,8 +463,8 @@ export default function EnhancedTable({item}) {
   const excelExportHandler = (e) => {
     let obj = {};
     let copyContents = [...contents];
-    for(let i =0; i<item.length; i++)
-      obj[item[i].column_name] = item[i].column_comment;
+    for(let i =0; i<menu.length; i++)
+      obj[menu[i].column_name] = menu[i].column_comment;
     
     copyContents.unshift(obj);
     console.log(copyContents);
@@ -459,7 +484,7 @@ export default function EnhancedTable({item}) {
       }
     };
 
-    const assets = xlsx.utils.json_to_sheet( copyContents, { header : item.map((it)=>{return it.column_name}), skipHeader : true } );
+    const assets = xlsx.utils.json_to_sheet( copyContents, { header : menu.map((it)=>{return it.column_name}), skipHeader : true } );
 
     const book = xlsx.utils.book_new();
     assets["!cols"] = [
@@ -493,7 +518,7 @@ export default function EnhancedTable({item}) {
     //getDir();
     //fileInput.current.click();
     xlsx.writeFile( book, "pws_list.xlsx"); 
-
+    getConfirmationOK(`PWS 자산리스트를 엑셀파일로 내보냈습니다.`);
   };
   const handleChange = e => {
     console.log(e.target.files[0]);
@@ -503,9 +528,10 @@ export default function EnhancedTable({item}) {
   
     // run code for dirHandle
   }
-  console.log('rows : ', rows[0]);
-  return (
+
+  const listPage = (
     <Box sx={{ width: '100%' }} style={{overflow: 'auto'}}>
+      <ConfirmationOK />
       <Paper sx={{ width: '4000px', mb: 2 }} style={{display:'flex', flexDirection: 'column', alignItems:'flex-start'}}>
         <div style={{display:'flex', flexDirection:'row', alignItems:'center'}}>
         <EnhancedTableToolbar numSelected={selected.length} />
@@ -531,7 +557,7 @@ export default function EnhancedTable({item}) {
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
               rowCount={rows.length}
-              pws_item = {item}
+              pws_item = {menu}
             />
             <TableBody>
               {stableSort(rows, getComparator(order, orderBy))
@@ -630,4 +656,25 @@ export default function EnhancedTable({item}) {
       /> */}
     </Box>
   );
+  // 로딩중일 때 렌더링할 페이지
+  const loadingPage = (
+    <div className='wrapper' style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '600px'}}>
+    <Spinner color="primary"> 
+        Loading...
+    </Spinner>
+    </div>
+  );
+  
+  const content = loading ? loadingPage : listPage;
+
+  console.log('rows : ', rows[0]);
+  return (
+    <div className={doScan ? "hide-data" : "show-data"}>
+      {content}
+    </div>
+    
+  );
 }
+
+// export default React.memo(EnhancedTable);
+export default EnhancedTable;

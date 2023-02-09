@@ -263,19 +263,19 @@ function ContentList() {
          <div className={isOpen ? "show-list" : "hide-list"}>
                 <ConfirmationYN />
                 <ConfirmationOK />
-                <Button variant="contained" sx={{ border: 'solid 1px', width: 20, height:19, padding: 1, m: 0.3 }} onClick={onClickDisappearHanler}>&lt;&lt;</Button>
+                <Button variant="contained" sx={{ border: 'solid 1px', width: 20, height:19 }} onClick={onClickDisappearHanler}>&lt;&lt;</Button>
                 <Paper sx={{
                     
 
                   width: 420,
-                  borderRadius: 5, borderColor: "#000",
+                  borderRadius: 3, borderColor: "#000",
                    backgroundColor: (theme) =>
                      theme.palette.mode === 'dark' ? '#1A2027' : '#FFFFF0',
                 }} elevation={8}>
                     <List>
                         {items}
                     </List>
-                    <div style={{border: 'solid 1px', display: 'flex', justifyContent: 'center'}}>
+                    <div style={{display: 'flex', justifyContent: 'center'}}>
                     <Button variant="contained" color="secondary" sx={{ width: 80, height:19, padding: 1, mb: 1, mr: 1 }} disabled={Boolean(bUploadDisabled | btnMode)} onClick={onClickUploadHandler}>upload</Button>
                     <Button variant="contained" sx={{ width: 80, height:19, padding: 1, mb: 1, mr: 1 }} disabled={Boolean(bModifyDisabled | btnMode)} onClick={onClickModifyHandler}>modify</Button>
                     </div>

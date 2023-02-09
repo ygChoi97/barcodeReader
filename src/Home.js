@@ -9,7 +9,7 @@ function Home() {
 
     return(
         <PwsContext.Provider value={value}>
-            <div className="wrapper" style={{width:'100%', display:'flex', flexDirection:'row', justifyContent:'space-between', alignItems:'flex-start'}}>
+            <div className="wrapper" style={{display:'flex', flexDirection:'row', justifyContent:'space-between', alignItems:'flex-start'}}>
                 <ScannerBtn />
                 <ContentList />
             </div>

@@ -35,7 +35,6 @@ function Content({item, update}) {
               '"Segoe UI Emoji"',
               '"Segoe UI Symbol"',
             ].join(','),
-            fontSize: 9,
           },
         // palette: {
         //     primary: {
@@ -45,12 +44,7 @@ function Content({item, update}) {
         //       main: blueGrey[400],
         //     },
         //   },
-        components:{
-            MuiTextField: {
 
-            },
-            
-        }
     });
     
     const handleChangeInput = (e) => {
@@ -74,7 +68,7 @@ function Content({item, update}) {
                 <ThemeProvider theme={theme}>
                     <Grid item xs={3}>            
                         <Typography 
-                            sx = {{fontWeight:600}}
+                            sx = {{fontSize: '0.7rem', fontWeight:600}}
                         >
                             {item.columnName}
                         </Typography>        
@@ -89,7 +83,7 @@ function Content({item, update}) {
                             label={item.columnName}
                             InputProps={{
                                 readOnly: true,
-                                style: { height: 12, fontSize:12, fontWeight: 600 }
+                                style: { height: '1rem', fontSize:'0.9rem', fontWeight: 600 }
                               }}
                             defaultValue={''}
                             variant = "standard"
@@ -100,7 +94,7 @@ function Content({item, update}) {
                         /> : 
                         item.dbColumn === 'introductiondate' ?
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            <DatePicker value={value}  inputFormat={"YYYY-MM-DD"} showToolbar
+                            <DatePicker value={value}  inputFormat={"YYYY-MM-DD"} showToolbar                            
                             onChange={(newValue) => {
                                 setValue(newValue);
                                                                 
@@ -114,10 +108,11 @@ function Content({item, update}) {
                             }}
                             renderInput={(params) => <TextField size="small" {...params} 
                             sx={{
-                                svg: { color },
-                                input: { color },
-                                label: { color }
-                              }}
+                                width: 1,
+                                "& .MuiInputBase-root": {
+                                    height: '1.6rem'
+                                }
+                            }}
                               />}
                             />
                           </LocalizationProvider> :
@@ -126,7 +121,7 @@ function Content({item, update}) {
                             requierd='true'
                             id="outlined-required"
                             //label={item.columnName}
-                            inputProps={{style: {height: 7, fontSize:9, fontWeight: 400}}}
+                            inputProps={{style: {height: 9, fontSize:'1rem', fontWeight: 400}}}
                             defaultValue=''
                             value = {item.data}
                             onChange={handleChangeInput}
@@ -136,12 +131,17 @@ function Content({item, update}) {
                         //placeholder={item.value}
                         fullWidth
                         id="standard-basic"
-                        inputProps={{style: {height: 7, fontSize:9, fontWeight: 400}}}
+                        inputProps={{style: {height: 9, fontSize:'0.7rem', fontWeight: 400}}}
                         //label={item.columnName}
                         defaultValue=''
                         value = {item.data}
-                        onChange={handleChangeInput}
-                        size="small"
+                        onChange={handleChangeInput}                        
+                        sx={{
+                            width: 1,
+                            "& .MuiInputBase-root": {
+                                height: '1.6rem'
+                            }
+                        }}
                     /> }
                     </Grid>
                 </ThemeProvider> 

@@ -11,7 +11,7 @@ function ScannerBtn() {
 
     return(
         // <div className="wrapper" style={{border:'solid 1px', width: '70%'}}>
-        <div className="wrapper" style={{width: '100%', position: 'relative', zIndex: 1}}>
+        <div className="wrapper" style={{position: 'relative', zIndex: 1}}>
 
             <div>
             { doScan ?
@@ -21,8 +21,8 @@ function ScannerBtn() {
             }
             </div>           
            
-            <div>
-                <LeftInfo item={doScan}/>
+            <div className="wrapper">
+                <LeftInfo doScan={doScan}/>
             </div>
         </div>
     );
