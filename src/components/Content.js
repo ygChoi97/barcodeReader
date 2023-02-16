@@ -110,7 +110,7 @@ function Content({item, update}) {
                             sx={{
                                 width: 1,
                                 "& .MuiInputBase-root": {
-                                    height: '1.6rem'
+                                    height: '1.6rem', fontSize: '0.7rem'
                                 }
                             }}
                               />}

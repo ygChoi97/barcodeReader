@@ -19,10 +19,12 @@ function LeftInfo({doScan}) {
 
     return (
         <div className="wrapper" style={{}}>
-            <Reader doScan={doScan}/>
-            
             <EnhancedTable doScan={doScan}/>
             
+            {doScan ? 
+            <Reader doScan={doScan}/>
+            : <></>
+            }   
         </div>
     );
 }

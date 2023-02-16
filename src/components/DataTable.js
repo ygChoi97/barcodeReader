@@ -418,6 +418,7 @@ const EnhancedTable = function({doScan}) {
             }
         })
         .then(json => {
+          console.log('json :', json);
           let copyMenu = [];
           for(let i=0; i<json.length; i++) {
             copyMenu.push(json[i]);
@@ -658,7 +659,7 @@ const EnhancedTable = function({doScan}) {
   );
   // 로딩중일 때 렌더링할 페이지
   const loadingPage = (
-    <div className='wrapper' style={{display: 'flex', justifyContent: 'center', alignItems: 'center', height: '600px'}}>
+    <div  style={{border :'solid', display:'flex', alignItems: 'center', justifyContent: 'center', width: '100vw', height: '70vh'}}>
     <Spinner color="primary"> 
         Loading...
     </Spinner>
@@ -676,5 +677,4 @@ const EnhancedTable = function({doScan}) {
   );
 }
 
-// export default React.memo(EnhancedTable);
-export default EnhancedTable;
+export default React.memo(EnhancedTable);
