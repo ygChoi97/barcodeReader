@@ -202,10 +202,7 @@ EnhancedTableHead.propTypes = {
   order: PropTypes.oneOf(['asc', 'desc']).isRequired,
   orderBy: PropTypes.string.isRequired,
   rowCount: PropTypes.number.isRequired,
-  pws_item: PropTypes.shape([{
-    column_name: PropTypes.string,
-    column_comment: PropTypes.string
-  }])
+  pws_item: PropTypes.arrayOf(PropTypes.objectOf(PropTypes.string))
 };
 
 function EnhancedTableToolbar(props) {
@@ -316,22 +313,6 @@ const EnhancedTable = function({doScan}) {
 
   const rows = [...contents];
 
-  const rows1 = [
-    createData('Cupcake', 305, 3.7, 67, 4.3),
-    createData('Donut', 452, 25.0, 51, 4.9),
-    createData('Eclair', 262, 16.0, 24, 6.0),
-    createData('Frozen yoghurt', 159, 6.0, 24, 4.0),
-    createData('Gingerbread', 356, 16.0, 49, 3.9),
-    createData('Honeycomb', 408, 3.2, 87, 6.5),
-    createData('Ice cream sandwich', 237, 9.0, 37, 4.3),
-    createData('Jelly Bean', 375, 0.0, 94, 0.0),
-    createData('KitKat', 518, 26.0, 65, 7.0),
-    createData('Lollipop', 392, 0.2, 98, 0.0),
-    createData('Marshmallow', 318, 0, 81, 2.0),
-    createData('Nougat', 360, 19.0, 9, 37.0),
-    createData('Oreo', 437, 18.0, 63, 4.0),
-  ];
-
   const handleRequestSort = (event, property) => {
     const isAsc = orderBy === property && order === 'asc';
     setOrder(isAsc ? 'desc' : 'asc');
@@ -418,13 +399,12 @@ const EnhancedTable = function({doScan}) {
             }
         })
         .then(json => {
-          console.log('json :', json);
           let copyMenu = [];
           for(let i=0; i<json.length; i++) {
             copyMenu.push(json[i]);
           }
           setMenu(copyMenu);
-          console.log(copyMenu);
+          console.log('useEffect() fetch - /menu' , copyMenu);
       });
     
     fetch(BASE_URL)
@@ -668,7 +648,7 @@ const EnhancedTable = function({doScan}) {
   
   const content = loading ? loadingPage : listPage;
 
-  console.log('rows : ', rows[0]);
+  console.log('EnhancedTable() 렌더링');
   return (
     <div className={doScan ? "hide-data" : "show-data"}>
       {content}

@@ -7,6 +7,7 @@ function Home() {
     const [managementId, setManagementId] = useState("");
     const value = { managementId, setManagementId };
 
+    console.log('Home() 렌더링');
     return(
         <PwsContext.Provider value={value}>
             <div className="wrapper" style={{display:'flex', flexDirection:'row', justifyContent:'space-between', alignItems:'flex-start'}}>

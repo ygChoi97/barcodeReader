@@ -1,8 +1,6 @@
 import React, { useState } from 'react'
 import { Dialog, DialogContent, DialogActions, Button } from '@mui/material'
 
-
-
 const useConfirm = () => {
   const [ openYN, setOpenYN ] = useState(false);
   const [ openOK, setOpenOK ] = useState(false);

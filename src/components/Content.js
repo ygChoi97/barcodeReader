@@ -1,6 +1,6 @@
 import { Grid, ListItem, TextField, Typography } from "@mui/material";
 import { createTheme, ThemeProvider } from '@mui/material/styles';
-import { DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import { DatePicker, DesktopDatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import React, { useEffect, useState } from "react";
 
@@ -94,7 +94,7 @@ function Content({item, update}) {
                         /> : 
                         item.dbColumn === 'introductiondate' ?
                         <LocalizationProvider dateAdapter={AdapterDayjs}>
-                            <DatePicker value={value}  inputFormat={"YYYY-MM-DD"} showToolbar                            
+                            <DesktopDatePicker value={value}  inputFormat={"YYYY-MM-DD"} showToolbar                            
                             onChange={(newValue) => {
                                 setValue(newValue);
                                                                 

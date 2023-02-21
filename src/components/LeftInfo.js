@@ -1,6 +1,6 @@
-import React, { useEffect } from "react";
 import Reader from "./Reader";
 import EnhancedTable from "./DataTable";
+import AutoComplete from "./AutoComplete";
 const BASE_URL = 'http://localhost:8181/api/pws';
 
 function LeftInfo({doScan}) {
@@ -17,9 +17,11 @@ function LeftInfo({doScan}) {
     //     </div>
     // );
 
+    console.log('LeftInfo() 렌더링')
     return (
         <div className="wrapper" style={{}}>
-            <EnhancedTable doScan={doScan}/>
+            {/* <EnhancedTable doScan={doScan}/> */}
+            <AutoComplete/>
             
             {doScan ? 
             <Reader doScan={doScan}/>

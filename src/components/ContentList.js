@@ -148,7 +148,7 @@ function ContentList() {
                         if(status) {
                             initContentsWithAssetId();
                             setBtnMode(true); 
-                            setBUploadDisabled(false); 
+                                  setBUploadDisabled(false); 
                             setBModifyDisabled(true);
                             console.log('reg returned!');
                             return;
@@ -258,19 +258,20 @@ function ContentList() {
     const onClickDisappearHanler = (e) => {
         setMenu(false);
     };
-    console.log('ContentList 리렌더링');
+    console.log('ContentList 렌더링');
     return(
          <div className={isOpen ? "show-list" : "hide-list"}>
                 <ConfirmationYN />
                 <ConfirmationOK />
                 <Button variant="contained" sx={{ border: 'solid 1px', width: 20, height:19 }} onClick={onClickDisappearHanler}>&lt;&lt;</Button>
+                
                 <Paper sx={{
                     
 
                   width: 420,
                   borderRadius: 3, borderColor: "#000",
                    backgroundColor: (theme) =>
-                     theme.palette.mode === 'dark' ? '#1A2027' : '#FFFFF0',
+                     theme.palette.mode === 'dark' ? '#1A2027' : '#FFFFFF',
                 }} elevation={8}>
                     <List>
                         {items}

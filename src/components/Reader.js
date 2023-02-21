@@ -1,7 +1,6 @@
 import React, { useContext } from 'react';
 import { useEffect, useRef, useState } from 'react';
-import CameraswitchIcon from '@mui/icons-material/Cameraswitch';
-import { BrowserMultiFormatReader, BarcodeFormat, DecodeHintType, EncodeHintType, DataMatrixReader, WhiteRectangleDetector, BrowserDatamatrixCodeReader, BinaryBitmap, LuminanceSource, HybridBinarizer, BitSource, BrowserCodeReader } from '@zxing/library';
+import { BrowserMultiFormatReader, BarcodeFormat, DecodeHintType } from '@zxing/library';
 import beepScan from '../sounds/Barcode-scanner-beep-sound.mp3';
 import PwsContext from './PWS-Context';
 import useConfirm from "./useConfirm";
@@ -37,7 +36,7 @@ const Reader = ({doScan}) => {
     
     const canvasRef = useRef(null);
     const contextRef = useRef(null);
-    const [ctx, setCtx] = useState();  //캔버스 컨텍스트를 useState로 상태관리
+    // const [ctx, setCtx] = useState();  //캔버스 컨텍스트를 useState로 상태관리
     let canvas = null;
     useEffect(() => {
 
@@ -89,19 +88,21 @@ const Reader = ({doScan}) => {
 
         const w = 4;
         const h = 6;
-        const wf = 50;
-        const hf = 30;
+        const wf = 95;
+        const hf = 60;
 
         const context = canvas.getContext('2d');
-        context.strokeStyle = 'red';
-        context.lineWidth = '1.5';
+        context.strokeStyle = "#FF0000";
+        context.lineWidth = '1.0';
+        context.lineCap = 'round';
         context.beginPath();
         context.moveTo(0, streamHeight/2);
         context.lineTo(streamWidth, streamHeight/2);
         context.stroke();
 
-        context.strokeStyle = 'yellow';
-        context.lineWidth = '1';
+        context.strokeStyle = "#000000";
+        context.lineWidth = '1.0';
+        context.lineCap = 'round';
         context.beginPath();
         context.moveTo(streamWidth/2-streamWidth/w, streamHeight/2-streamHeight/h + streamHeight/hf);
         context.lineTo(streamWidth/2-streamWidth/w, streamHeight/2-streamHeight/h);
@@ -122,7 +123,7 @@ const Reader = ({doScan}) => {
         context.stroke();
         contextRef.current = context;
 
-        setCtx(contextRef.current);
+        // setCtx(contextRef.current);
         
     },[streamHeight]);
 
@@ -148,7 +149,7 @@ const Reader = ({doScan}) => {
         console.log('scan');
         if (localStream && Camera.current) {
             try {
-                await Scan.decodeFromStream(localStream, Camera.current, (data, err) => {
+                const data = await Scan.decodeFromStream(localStream, Camera.current, (data, err) => {
                     if (data) {
                         if(isCodePWSFormat(data.getText())) {
                             Scan.stopStreams();  // 카메라 스트림 중지
@@ -156,8 +157,8 @@ const Reader = ({doScan}) => {
                             scanSound.play();
                             
                             setText(data.getText());
+                            console.log('It is PWS barcode.',data);
                             if(data.getText() === managementId){
-                                // alert(`스캔한 ${data.getText()} 은(는) 이미 등록 진행중인 자산관리번호입니다.`);
                                 getConfirmationOK(`스캔한 ${data.getText()} 은(는) 이미 등록 진행중인 자산관리번호입니다.`);
                             }
                             else   ;    
@@ -165,7 +166,7 @@ const Reader = ({doScan}) => {
                             setIsScanning(false);
                         }
                         else {
-                            console.log('It is not PWS barcode.');
+                            console.log('It is not PWS barcode.',data);
                         }          
                     }
                     else {
@@ -201,8 +202,9 @@ const Reader = ({doScan}) => {
         }
         setIsScanning(true);
     };   
-    console.log('Reader 렌더링 : ', isScanning);
     
+    
+    console.log('Reader() 렌더링 : ', isScanning);
     return (
         <div className={doScan ? "show-reader" : "hide-reader"}>
             <ConfirmationOK/>
@@ -214,7 +216,7 @@ const Reader = ({doScan}) => {
             <div style={{display:'flex', flexDirection:'row', alignItems:'center'}}>
                 <video ref={Camera} id="video"/>
                 
-                <Loop color='primary' sx={{ fontSize: 35 }} style={{marginLeft:'30px'}} onClick={onToggleCemeraHandler}/>
+                <Loop color='primary' sx={{ fontSize: 35, color:'inherit' }} style={{marginLeft:'30px'}} onClick={onToggleCemeraHandler}/>
             </div>
             <div style={{margin:'20px 0px'}}>
                 <p>{text}</p>
