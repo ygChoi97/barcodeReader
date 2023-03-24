@@ -100,7 +100,7 @@ const Reader = ({doScan}) => {
         context.lineTo(streamWidth, streamHeight/2);
         context.stroke();
 
-        context.strokeStyle = "#000000";
+        context.strokeStyle = "#ffcc00";
         context.lineWidth = '1.0';
         context.lineCap = 'round';
         context.beginPath();
@@ -211,12 +211,12 @@ const Reader = ({doScan}) => {
             { isScanning ?
                 <canvas ref={canvasRef} style={{position: 'absolute', zIndex: 2}}/>
              :
-                <canvas ref={canvasRef} style={{position: 'absolute', zIndex: 2, visibility: 'hidden'}}/>
+             <canvas ref={canvasRef} style={{position: 'absolute', zIndex: 2, visibility: 'hidden'}}/>
             }
             <div style={{display:'flex', flexDirection:'row', alignItems:'center'}}>
                 <video ref={Camera} id="video"/>
                 
-                <Loop color='primary' sx={{ fontSize: 35, color:'inherit' }} style={{marginLeft:'30px'}} onClick={onToggleCemeraHandler}/>
+                <Loop sx={{ fontSize: 35, color:'inherit' }} style={{marginLeft:'30px'}} onClick={onToggleCemeraHandler}/>
             </div>
             <div style={{margin:'20px 0px'}}>
                 <p>{text}</p>

@@ -20,8 +20,8 @@ function LeftInfo({doScan}) {
     console.log('LeftInfo() 렌더링')
     return (
         <div className="wrapper" style={{}}>
-            {/* <EnhancedTable doScan={doScan}/> */}
-            <AutoComplete/>
+            <EnhancedTable doScan={doScan}/>
+            {/* <EnhancedTable/> */}
             
             {doScan ? 
             <Reader doScan={doScan}/>

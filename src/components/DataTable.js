@@ -134,14 +134,14 @@ function EnhancedTableHead(props) {
   //   },
   // ];
 
-  
-  
+
+
   const { onSelectAllClick, order, orderBy, numSelected, rowCount, onRequestSort, pws_item } =
     props;
 
 
   const headCells = pws_item.map(itm => {
-    let obj = {id:'', numeric:false, disablePadding:false, label:''};
+    let obj = { id: '', numeric: false, disablePadding: false, label: '' };
     obj.id = itm.column_name;
     // if(itm.column_name === 'userid')
     //   obj.numeric = true;
@@ -260,7 +260,7 @@ EnhancedTableToolbar.propTypes = {
   numSelected: PropTypes.number.isRequired,
 };
 
-const EnhancedTable = function({doScan}) {
+const EnhancedTable = function ({ doScan }) {
   const [order, setOrder] = React.useState('asc');
   //const [orderBy, setOrderBy] = React.useState('calories');
   const [orderBy, setOrderBy] = React.useState('idasset');
@@ -272,42 +272,42 @@ const EnhancedTable = function({doScan}) {
   const [contents, setContents] = useState([]);
   const { managementId, setManagementId } = useContext(PwsContext);
   const [loading, setLoading] = useState(true);
-  const [ getConfirmationYN, ConfirmationYN, getConfirmationOK, ConfirmationOK ] = useConfirm();
+  const [getConfirmationYN, ConfirmationYN, getConfirmationOK, ConfirmationOK] = useConfirm();
   const [menu, setMenu] = React.useState([]);
   const fileInput = React.useRef(null);
-//   function createData(name, calories, fat, carbs, protein) {
-//   console.log({name,
-//     calories,
-//     fat,
-//     carbs,
-//     protein,});rows
-//   return {
-//     name,
-//     calories,
-//     fat,
-//     carbs,
-//     protein,
-//   };
-// }
+  //   function createData(name, calories, fat, carbs, protein) {
+  //   console.log({name,
+  //     calories,
+  //     fat,
+  //     carbs,
+  //     protein,});rows
+  //   return {
+  //     name,
+  //     calories,
+  //     fat,
+  //     carbs,
+  //     protein,
+  //   };
+  // }
 
   function createData(...param) {
     let obj = {};
-    for(let i =0; i<menu.length; i++) {
+    for (let i = 0; i < menu.length; i++) {
       obj[menu[i].column_name] = param[i];
     }
     // console.log(obj);
     return obj;
   }
-  
+
   // const rows = contents.map(pws => {
   //   let obj = [];
   //   for(let name in pws) {
   //     if(name === 'userid')
   //       parseInt(obj.push(pws[name]));
   //     obj.push(pws[name]);
-      
+
   //   }
-    
+
   //   return createData(...obj);
   // });
 
@@ -332,7 +332,7 @@ const EnhancedTable = function({doScan}) {
   const handleClick = (event, idasset) => {
     const selectedIndex = selected.indexOf(idasset);
     let newSelected = [];
-  
+
     if (selectedIndex === -1) {
       newSelected = newSelected.concat(selected, idasset);
     } else if (selectedIndex === 0) {
@@ -389,68 +389,66 @@ const EnhancedTable = function({doScan}) {
   }
 
   useEffect(() => {
-    fetch(BASE_URL+`/menu`)
-        .then(res => {
-            if(!res.ok) {
-                throw new Error(res.status);
-            }
-            else { 
-                return res.json();
-            }
-        })
-        .then(json => {
-          let copyMenu = [];
-          for(let i=0; i<json.length; i++) {
-            copyMenu.push(json[i]);
-          }
-          setMenu(copyMenu);
-          console.log('useEffect() fetch - /menu' , copyMenu);
-      });
-    
-    fetch(BASE_URL)
-    .then(res => {
-      if(!res.ok) {
+    fetch(BASE_URL + `/menu`)
+      .then(res => {
+        if (!res.ok) {
           throw new Error(res.status);
-      }
-      else {
+        }
+        else {
           return res.json();
-      }
-    })
-    .then(json => { 
-       let copyContents = [...contents];
-       for(let i=0; i<json.count; i++) {
-           //console.log(json.pwsDtos[i]);
-           let copyContent = {};
-           copyContent = json.pwsDtos[i]
-           if(json.pwsDtos[i].introductiondate !== null || json.pwsDtos[i].introductiondate != undefined) {
+        }
+      })
+      .then(json => {
+        let copyMenu = [];
+        for (let i = 0; i < json.length; i++) {
+          copyMenu.push(json[i]);
+        }
+        setMenu(copyMenu);
+        console.log('useEffect() fetch - /menu', copyMenu);
+      });
+
+    fetch(BASE_URL)
+      .then(res => {
+        if (!res.ok) {
+          throw new Error(res.status);
+        }
+        else {
+          return res.json();
+        }
+      })
+      .then(json => {
+        let copyContents = [...contents];
+        for (let i = 0; i < json.count; i++) {
+          //console.log(json.pwsDtos[i]);
+          let copyContent = {};
+          copyContent = json.pwsDtos[i]
+          if (json.pwsDtos[i].introductiondate != null || json.pwsDtos[i].introductiondate != undefined) {
             let day = new Date(json.pwsDtos[i].introductiondate);
             copyContent['introductiondate'] = dateFormat(day);
+          }
 
-           }
-            //console.log(json.pwsDtos[i].introductiondate);
-           
-           copyContents.push(copyContent);
-       }
-       setContents(copyContents);  
-      
-       setLoading(false);
-      //setContents(json.pwsDtos);
-      // console.log(copyContents[0]);
-      // console.log(copyContents[json.count-1]);
-      console.log('all data : ', contents);
-    })
-  
+          copyContents.push(copyContent);
+        }
+        setContents(copyContents);
+
+        setLoading(false);
+        //setContents(json.pwsDtos);
+        // console.log(copyContents[0]);
+        // console.log(copyContents[json.count-1]);
+        console.log('all data : ', copyContents);
+      })
+
   }, []);
   const excelExportHandler = (e) => {
     let obj = {};
     let copyContents = [...contents];
-    for(let i =0; i<menu.length; i++)
+    for (let i = 0; i < menu.length; i++)
       obj[menu[i].column_name] = menu[i].column_comment;
-    
+
     copyContents.unshift(obj);
     console.log(copyContents);
 
-    const xlsx = require( "xlsx" );
+    const xlsx = require("xlsx");
 
     const write_opts = {
       type: "buffer",
@@ -465,40 +463,40 @@ const EnhancedTable = function({doScan}) {
       }
     };
 
-    const assets = xlsx.utils.json_to_sheet( copyContents, { header : menu.map((it)=>{return it.column_name}), skipHeader : true } );
+    const assets = xlsx.utils.json_to_sheet(copyContents, { header: menu.map((it) => { return it.column_name }), skipHeader: true });
 
     const book = xlsx.utils.book_new();
     assets["!cols"] = [
-      { wpx : 70 }    // 자산관리번호
-    , { wpx : 50 }    // 사용구분
-    , { wpx : 40 }    // 회사
-    , { wpx : 100 }   // 본부
-    , { wpx : 130 }   // 센터
-    , { wpx : 120 }   // 관리부서
-    , { wpx : 60 }    // 사용자
-    , { wpx : 60 }    // 사용자ID
-    , { wpx : 100 }   // 코스트센터CD
-    , { wpx : 60 }    // 모델명
-    , { wpx : 70 }    // 자산번호
-    , { wpx : 80 }    // S/N
-    , { wpx : 60 }    // 그래픽카드
-    , { wpx : 60 }    // 모니터
-    , { wpx : 70 }    // 지역
-    , { wpx : 80 }    // 건물명
-    , { wpx : 40 }    // 층수
-    , { wpx : 100 }   // 상세위치
-    , { wpx : 50 }    // 구매용도
-    , { wpx : 50 }    // 사용용도
-    , { wpx : 70 }    // 도입년월
-    , { wpx : 120 }   // 비고
-    , { wpx : 120 }   // 상세업무
-  ]
+      { wpx: 70 }    // 자산관리번호
+      , { wpx: 50 }    // 사용구분
+      , { wpx: 40 }    // 회사
+      , { wpx: 100 }   // 본부
+      , { wpx: 130 }   // 센터
+      , { wpx: 120 }   // 관리부서
+      , { wpx: 60 }    // 사용자
+      , { wpx: 60 }    // 사용자ID
+      , { wpx: 100 }   // 코스트센터CD
+      , { wpx: 60 }    // 모델명
+      , { wpx: 70 }    // 자산번호
+      , { wpx: 80 }    // S/N
+      , { wpx: 60 }    // 그래픽카드
+      , { wpx: 60 }    // 모니터
+      , { wpx: 70 }    // 지역
+      , { wpx: 80 }    // 건물명
+      , { wpx: 40 }    // 층수
+      , { wpx: 100 }   // 상세위치
+      , { wpx: 50 }    // 구매용도
+      , { wpx: 50 }    // 사용용도
+      , { wpx: 70 }    // 도입년월
+      , { wpx: 120 }   // 비고
+      , { wpx: 120 }   // 상세업무
+    ]
 
-    xlsx.utils.book_append_sheet( book, assets, "자산리스트" );
-    
+    xlsx.utils.book_append_sheet(book, assets, "자산리스트");
+
     //getDir();
     //fileInput.current.click();
-    xlsx.writeFile( book, "pws_list.xlsx"); 
+    xlsx.writeFile(book, "pws_list.xlsx");
     getConfirmationOK(`PWS 자산리스트를 엑셀파일로 내보냈습니다.`);
   };
   const handleChange = e => {
@@ -506,28 +504,30 @@ const EnhancedTable = function({doScan}) {
   };
   async function getDir() {
     const dirHandle = await window.showFilePicker();
-  
+
     // run code for dirHandle
   }
 
   const listPage = (
-    <Box sx={{ width: '100%' }} style={{overflow: 'auto'}}>
+    <Box sx={{ width: '100%' }} style={{ overflow: 'auto' }}>
       <ConfirmationOK />
-      <Paper sx={{ width: '4000px', mb: 2 }} style={{display:'flex', flexDirection: 'column', alignItems:'flex-start'}}>
-        <div style={{display:'flex', flexDirection:'row', alignItems:'center'}}>
-        <EnhancedTableToolbar numSelected={selected.length} />
-        <Button variant='contained' sx={{ width: 145, height:29}} onClick={excelExportHandler}>excel export</Button>
-        <input type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ref={fileInput} onChange={handleChange} style={{ display: "none" }} />
+      <Paper sx={{ width: '4000px', mb: 2 }} style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start' }}>
+        <div style={{ display: 'flex', flexDirection: 'row', alignItems: 'center' }}>
+          <EnhancedTableToolbar numSelected={selected.length} />
+          <Button variant='contained' sx={{ width: 145, height: 29 }} onClick={excelExportHandler}>excel export</Button>
+          <input type="file" accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ref={fileInput} onChange={handleChange} style={{ display: "none" }} />
         </div>
         <TableContainer>
           <Table
-            sx={{ minWidth: 750,
-            borderBottom: "2px solid black",
-            "& th": {
-              fontSize: ".75rem",
-              fontWeight: 900
+            sx={{
+              minWidth: 750,
+              borderBottom: "2px solid black",
+              "& th": {
+                fontSize: ".75rem",
+                fontWeight: 900
 
-            }}}
+              }
+            }}
             aria-labelledby="tableTitle"
             size={dense ? 'small' : 'medium'}
           >
@@ -538,7 +538,7 @@ const EnhancedTable = function({doScan}) {
               onSelectAllClick={handleSelectAllClick}
               onRequestSort={handleRequestSort}
               rowCount={rows.length}
-              pws_item = {menu}
+              pws_item={menu}
             />
             <TableBody>
               {stableSort(rows, getComparator(order, orderBy))
@@ -547,20 +547,20 @@ const EnhancedTable = function({doScan}) {
                   // const isItemSelected = isSelected(row.name);
                   const isItemSelected = isSelected(row.idasset);
                   const labelId = `enhanced-table-checkbox-${index}`;
-                  
+
                   return (
                     <TableRow
                       hover
-                      
+
                       onClick={(event) => handleRowClick(event, row.idasset)}
-                      
+
                       role="checkbox"
                       aria-checked={isItemSelected}
                       tabIndex={-1}
                       // key={row.name}
                       key={row.idasset}
                       selected={isItemSelected}
-                      
+
                     >
                       <TableCell padding="checkbox">
                         <Checkbox
@@ -577,35 +577,35 @@ const EnhancedTable = function({doScan}) {
                         id={labelId}
                         scope="row"
                         padding="none"
-                        sx={{fontSize: ".6rem", width:'136px'}}
+                        sx={{ fontSize: ".6rem", width: '136px' }}
                       >
                         {/* {row.name} */}
                         {row.idasset}
-                          
+
                       </TableCell>
 
-                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.uptake}</TableCell>
-                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.company}</TableCell>
-                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.headquarters}</TableCell>
-                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.center}</TableCell>
-                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.department}</TableCell>
-                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.username}</TableCell>
-                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.userid}</TableCell>
-                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.centercd}</TableCell>
-                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.model}</TableCell>
-                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.assetno}</TableCell>
-                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.sn}</TableCell>
-                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.graphic}</TableCell>
-                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.monitor}</TableCell>
-                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.area}</TableCell>
-                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.building}</TableCell>
-                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.storey}</TableCell>
-                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.location}</TableCell>
-                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.objpurchase}</TableCell>
-                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.objuse}</TableCell>
-                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.introductiondate}</TableCell>
-                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.note}</TableCell>
-                      <TableCell align="left" sx={{fontSize: "0.6rem"}}>{row.desctask}</TableCell>
+                      <TableCell align="left" sx={{ fontSize: "0.6rem" }}>{row.uptake}</TableCell>
+                      <TableCell align="left" sx={{ fontSize: "0.6rem" }}>{row.company}</TableCell>
+                      <TableCell align="left" sx={{ fontSize: "0.6rem" }}>{row.headquarters}</TableCell>
+                      <TableCell align="left" sx={{ fontSize: "0.6rem" }}>{row.center}</TableCell>
+                      <TableCell align="left" sx={{ fontSize: "0.6rem" }}>{row.department}</TableCell>
+                      <TableCell align="left" sx={{ fontSize: "0.6rem" }}>{row.username}</TableCell>
+                      <TableCell align="left" sx={{ fontSize: "0.6rem" }}>{row.userid}</TableCell>
+                      <TableCell align="left" sx={{ fontSize: "0.6rem" }}>{row.centercd}</TableCell>
+                      <TableCell align="left" sx={{ fontSize: "0.6rem" }}>{row.model}</TableCell>
+                      <TableCell align="left" sx={{ fontSize: "0.6rem" }}>{row.assetno}</TableCell>
+                      <TableCell align="left" sx={{ fontSize: "0.6rem" }}>{row.sn}</TableCell>
+                      <TableCell align="left" sx={{ fontSize: "0.6rem" }}>{row.graphic}</TableCell>
+                      <TableCell align="left" sx={{ fontSize: "0.6rem" }}>{row.monitor}</TableCell>
+                      <TableCell align="left" sx={{ fontSize: "0.6rem" }}>{row.area}</TableCell>
+                      <TableCell align="left" sx={{ fontSize: "0.6rem" }}>{row.building}</TableCell>
+                      <TableCell align="left" sx={{ fontSize: "0.6rem" }}>{row.storey}</TableCell>
+                      <TableCell align="left" sx={{ fontSize: "0.6rem" }}>{row.location}</TableCell>
+                      <TableCell align="left" sx={{ fontSize: "0.6rem" }}>{row.objpurchase}</TableCell>
+                      <TableCell align="left" sx={{ fontSize: "0.6rem" }}>{row.objuse}</TableCell>
+                      <TableCell align="left" sx={{ fontSize: "0.6rem" }}>{row.introductiondate}</TableCell>
+                      <TableCell align="left" sx={{ fontSize: "0.6rem" }}>{row.note}</TableCell>
+                      <TableCell align="left" sx={{ fontSize: "0.6rem" }}>{row.desctask}</TableCell>
                     </TableRow>
                   );
                 })}
@@ -639,13 +639,13 @@ const EnhancedTable = function({doScan}) {
   );
   // 로딩중일 때 렌더링할 페이지
   const loadingPage = (
-    <div  style={{border :'solid', display:'flex', alignItems: 'center', justifyContent: 'center', width: '100vw', height: '70vh'}}>
-    <Spinner color="primary"> 
+    <div style={{ border: 'solid', display: 'flex', alignItems: 'center', justifyContent: 'center', width: '100vw', height: '70vh' }}>
+      <Spinner color="primary">
         Loading...
-    </Spinner>
+      </Spinner>
     </div>
   );
-  
+
   const content = loading ? loadingPage : listPage;
 
   console.log('EnhancedTable() 렌더링');
@@ -653,7 +653,7 @@ const EnhancedTable = function({doScan}) {
     <div className={doScan ? "hide-data" : "show-data"}>
       {content}
     </div>
-    
+
   );
 }
 
