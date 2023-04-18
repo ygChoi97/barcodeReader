@@ -91,12 +91,22 @@ function ContentList() {
                 }       
             }
         }
+
+       
+
         setContents(copyContents);
         console.log('contents updated: ', contents);
     }
 
     // PWS 정보 렌더링 
     const items = contents.map(item => {
+        console.log(item);
+        if(item.data == null || item.data == undefined) {
+            if(item.dbColumn == 'introductiondate')
+                item.data = null;
+            else
+                item.data = '';
+        }
         return <Content key={item.columnName} item={item} update={update}/>;
     });
     
@@ -115,6 +125,8 @@ function ContentList() {
             console.log(json);
             let copyContents = [...contents];
             for(let i=0; i<json.length; i++) {
+                if(json[i].column_name === 'id')
+                    continue;
                 let copyContent = {};
                 copyContent.columnName = json[i].column_comment;
                 copyContent.dbColumn = json[i].column_name;
@@ -123,7 +135,8 @@ function ContentList() {
                 copyContents.push(copyContent);
             }
             setContents(copyContents);  
-            console.log('자산 세부항목 정보 fetch 완료!')       
+            console.log(copyContents);
+            console.log('자산 세부항목 정보 fetch 완료!');       
         })
         .catch((error) => {
             console.log('error: ' + error);
@@ -255,20 +268,24 @@ function ContentList() {
         
     }
 
-    const onClickDisappearHanler = (e) => {
-        setMenu(false);
+    const onClickDisplayHanler = (e) => {
+        setMenu(!isOpen);
     };
     console.log('ContentList 렌더링');
     return(
-         <div className={isOpen ? "show-list" : "hide-list"}>
+         <div className={isOpen ? "show-list" : "hide-list"} style={{border: '1px solid'}}>
                 <ConfirmationYN />
                 <ConfirmationOK />
-                <Button variant="contained" sx={{ border: 'solid 1px', width: 20, height:19 }} onClick={onClickDisappearHanler}>&lt;&lt;</Button>
-                
+
+                {isOpen ?
+                <Button variant="contained" size="small" sx={{ border: 'solid 1px', width: 10 }} onClick={onClickDisplayHanler}>&lt;&lt;</Button>
+                    :
+                    <></>
+                }
                 <Paper sx={{
                     
 
-                  width: 420,
+                  width: 400,
                   borderRadius: 3, borderColor: "#000",
                    backgroundColor: (theme) =>
                      theme.palette.mode === 'dark' ? '#1A2027' : '#FFFFFF',
@@ -281,6 +298,10 @@ function ContentList() {
                     <Button variant="contained" sx={{ width: 80, height:19, padding: 1, mb: 1, mr: 1 }} disabled={Boolean(bModifyDisabled | btnMode)} onClick={onClickModifyHandler}>modify</Button>
                     </div>
                 </Paper>
+                {isOpen ? <></>
+                                    :
+                                    <Button variant="contained" sx={{ border: 'solid 1px', width: 20, height:19 }} onClick={onClickDisplayHanler}>&gt;&gt;</Button>
+                }
                 
                 
                 

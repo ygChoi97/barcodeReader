@@ -1,6 +1,7 @@
-import { AddAPhotoRounded,  LinkedCameraRounded } from "@mui/icons-material";
+import { AddAPhotoRounded,  FitScreen,  LinkedCameraRounded, PlaylistAddCheck } from "@mui/icons-material";
 import React, { useState } from "react";
 import LeftInfo from "./LeftInfo";
+import BarcodeIcon from "../barcode-icon.bmp"
 
 function ScannerBtn() {
     const [doScan, setDoScan] = useState(false);
@@ -16,9 +17,11 @@ function ScannerBtn() {
 
             <div>
                 {doScan ?
-                    <LinkedCameraRounded sx={{ fontSize: 25 }} onClick={onToggleScanHandler} />
+                    <PlaylistAddCheck sx={{ fontSize: 35 }} onClick={onToggleScanHandler} />
                     :
-                    <AddAPhotoRounded sx={{ fontSize: 25 }} onClick={onToggleScanHandler} />
+                    // <AddAPhotoRounded sx={{ fontSize: 25 }} onClick={onToggleScanHandler} />
+                    // <img src={BarcodeIcon} style={{width: '3rem', margin: '0.2rem 0.2rem'}} alt="barcode" onClick={onToggleScanHandler}/>
+                    <FitScreen sx={{ fontSize: 35 }} onClick={onToggleScanHandler} />
                 }
             </div>
 

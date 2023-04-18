@@ -1,6 +1,9 @@
 import Reader from "./Reader";
 import EnhancedTable from "./DataTable";
 import AutoComplete from "./AutoComplete";
+import Pws from "./Pws";
+import Reader2 from "./Reader2";
+import MyInputComponent from "./MyInputComponent";
 const BASE_URL = 'http://localhost:8181/api/pws';
 
 function LeftInfo({doScan}) {
@@ -19,12 +22,14 @@ function LeftInfo({doScan}) {
 
     console.log('LeftInfo() 렌더링')
     return (
-        <div className="wrapper" style={{}}>
-            <EnhancedTable doScan={doScan}/>
-            {/* <EnhancedTable/> */}
+        <div className="wrapper" style={{border: '1px solid', }}>
+            {/* <EnhancedTable doScan={doScan}/> */}
+            <Pws doScan={doScan} />
+
             
             {doScan ? 
-            <Reader doScan={doScan}/>
+            <Reader2 doScan={doScan}/>
+            // <MyInputComponent></MyInputComponent>
             : <></>
             }   
         </div>
